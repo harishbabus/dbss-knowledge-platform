@@ -1,13 +1,22 @@
-from app.connectors.confluence_client import ConfluenceClient
+from app.crawler.inventory import InventoryCrawler
+from app.storage.csv_writer import save_pages
 
 
 def main():
 
-    client = ConfluenceClient()
+    print("Starting Confluence crawl...")
 
-    space = client.get_space()
+    crawler = InventoryCrawler()
 
-    print(space)
+    count = crawler.crawl_pages()
+
+    print(
+        f"Pages processed: {count}"
+    )
+
+    save_pages(pages, "data/inventory/confluence_inventory.csv")
+
+    print("Inventory completed")
 
 
 if __name__ == "__main__":

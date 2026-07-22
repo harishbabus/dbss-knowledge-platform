@@ -1,35 +1,82 @@
+import time
 import httpx
 
 from app.config.settings import settings
+from app.utils.logger import logger
 
 
 class ConfluenceClient:
 
     def __init__(self):
+
         self.base_url = settings.CONFLUENCE_URL
-        self.auth = (
-            settings.USERNAME,
-            settings.PASSWORD
-        )
 
         self.client = httpx.Client(
-            auth=self.auth,
-            timeout=30
+            auth=(
+                settings.USERNAME,
+                settings.PASSWORD
+            ),
+            timeout=60
         )
 
 
-    def get_space(self, space_key=None):
-
-        if space_key is None:
-            space_key = settings.SPACE_KEY
+    def get_pages(
+        self,
+        start=0,
+        limit=100
+    ):
 
         url = (
             f"{self.base_url}"
-            f"/rest/api/space/{space_key}"
+            f"/rest/api/space/"
+            f"{settings.SPACE_KEY}"
+            f"/content/page"
         )
 
-        response = self.client.get(url)
+        params = {
+            "start": start,
+            "limit": limit
+        }
 
-        response.raise_for_status()
 
-        return response.json()
+        retries = 3
+
+
+        for attempt in range(1, retries + 1):
+
+            try:
+
+                logger.info(
+                    f"API request attempt {attempt}"
+                )
+
+
+                response = self.client.get(
+                    url,
+                    params=params
+                )
+
+                response.raise_for_status()
+
+                return response.json()
+
+
+            except httpx.RequestError as e:
+
+                logger.warning(
+                    f"Request failed: {e}"
+                )
+
+
+                if attempt < retries:
+
+                    wait_time = attempt * 5
+
+                    logger.info(
+                        f"Retrying after {wait_time}s"
+                    )
+
+                    time.sleep(wait_time)
+
+                else:
+                    raise
