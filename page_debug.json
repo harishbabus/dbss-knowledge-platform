@@ -1,0 +1,235 @@
+{
+    "id": "150710119",
+    "type": "page",
+    "status": "current",
+    "title": "41-Offer Attachment_TSAT",
+    "history": {
+        "latest": true,
+        "createdBy": {
+            "type": "known",
+            "username": "sriniru",
+            "userKey": "42aab8ff7b72c0d4017c49031bde004c",
+            "profilePicture": {
+                "path": "/confluence/images/icons/profilepics/default.svg",
+                "width": 48,
+                "height": 48,
+                "isDefault": true
+            },
+            "displayName": "Rudya S",
+            "_links": {
+                "self": "https://wiki.tecnotree.com/confluence/rest/api/user?key=42aab8ff7b72c0d4017c49031bde004c"
+            },
+            "_expandable": {
+                "status": ""
+            }
+        },
+        "createdDate": "2024-04-22T12:29:28.207+03:00",
+        "_links": {
+            "self": "https://wiki.tecnotree.com/confluence/rest/api/content/150710119/history"
+        },
+        "_expandable": {
+            "lastUpdated": "",
+            "previousVersion": "",
+            "contributors": "",
+            "nextVersion": ""
+        }
+    },
+    "version": {
+        "by": {
+            "type": "known",
+            "username": "sriniru",
+            "userKey": "42aab8ff7b72c0d4017c49031bde004c",
+            "profilePicture": {
+                "path": "/confluence/images/icons/profilepics/default.svg",
+                "width": 48,
+                "height": 48,
+                "isDefault": true
+            },
+            "displayName": "Rudya S",
+            "_links": {
+                "self": "https://wiki.tecnotree.com/confluence/rest/api/user?key=42aab8ff7b72c0d4017c49031bde004c"
+            },
+            "_expandable": {
+                "status": ""
+            }
+        },
+        "when": "2024-04-22T12:34:33.905+03:00",
+        "message": "",
+        "number": 1,
+        "minorEdit": false,
+        "hidden": false,
+        "_links": {
+            "self": "https://wiki.tecnotree.com/confluence/rest/experimental/content/150710119/version/1"
+        },
+        "_expandable": {
+            "content": "/rest/api/content/150710119"
+        }
+    },
+    "ancestors": [
+        {
+            "id": "58687639",
+            "type": "page",
+            "status": "current",
+            "title": "DIGITAL PRODUCT COMMAND CENTER",
+            "extensions": {
+                "position": 0
+            },
+            "_links": {
+                "webui": "/display/DPCC/DIGITAL+PRODUCT+COMMAND+CENTER",
+                "edit": "/pages/resumedraft.action?draftId=58687639",
+                "tinyui": "/x/l4B-Aw",
+                "self": "https://wiki.tecnotree.com/confluence/rest/api/content/58687639"
+            },
+            "_expandable": {
+                "container": "/rest/api/space/DPCC",
+                "metadata": "",
+                "operations": "",
+                "children": "/rest/api/content/58687639/child",
+                "restrictions": "/rest/api/content/58687639/restriction/byOperation",
+                "history": "/rest/api/content/58687639/history",
+                "ancestors": "",
+                "body": "",
+                "version": "",
+                "descendants": "/rest/api/content/58687639/descendant",
+                "space": "/rest/api/space/DPCC"
+            }
+        },
+        {
+            "id": "69481104",
+            "type": "page",
+            "status": "current",
+            "title": "Digital : Value Engineering - I",
+            "extensions": {
+                "position": 43
+            },
+            "_links": {
+                "webui": "/display/DPCC/Digital+%3A+Value+Engineering+-+I",
+                "edit": "/pages/resumedraft.action?draftId=69481104&draftShareId=84bc7fc1-2e15-4720-86d5-4f7781d60112",
+                "tinyui": "/x/kDIkB",
+                "self": "https://wiki.tecnotree.com/confluence/rest/api/content/69481104"
+            },
+            "_expandable": {
+                "container": "/rest/api/space/DPCC",
+                "metadata": "",
+                "operations": "",
+                "children": "/rest/api/content/69481104/child",
+                "restrictions": "/rest/api/content/69481104/restriction/byOperation",
+                "history": "/rest/api/content/69481104/history",
+                "ancestors": "",
+                "body": "",
+                "version": "",
+                "descendants": "/rest/api/content/69481104/descendant",
+                "space": "/rest/api/space/DPCC"
+            }
+        },
+        {
+            "id": "97647402",
+            "type": "page",
+            "status": "current",
+            "title": "02-API-Specifications",
+            "extensions": {
+                "position": 6
+            },
+            "_links": {
+                "webui": "/display/DPCC/02-API-Specifications",
+                "edit": "/pages/resumedraft.action?draftId=97647402&draftShareId=9aab184b-3594-4bda-91f9-1553f35ca6a5",
+                "tinyui": "/x/KvvRBQ",
+                "self": "https://wiki.tecnotree.com/confluence/rest/api/content/97647402"
+            },
+            "_expandable": {
+                "container": "/rest/api/space/DPCC",
+                "metadata": "",
+                "operations": "",
+                "children": "/rest/api/content/97647402/child",
+                "restrictions": "/rest/api/content/97647402/restriction/byOperation",
+                "history": "/rest/api/content/97647402/history",
+                "ancestors": "",
+                "body": "",
+                "version": "",
+                "descendants": "/rest/api/content/97647402/descendant",
+                "space": "/rest/api/space/DPCC"
+            }
+        },
+        {
+            "id": "127484779",
+            "type": "page",
+            "status": "current",
+            "title": "MTN-IC",
+            "extensions": {
+                "position": "none"
+            },
+            "_links": {
+                "webui": "/display/DPCC/MTN-IC",
+                "edit": "/pages/resumedraft.action?draftId=127484779&draftShareId=fd6823b7-8848-4b74-b115-288fb8423394",
+                "tinyui": "/x/a0OZBw",
+                "self": "https://wiki.tecnotree.com/confluence/rest/api/content/127484779"
+            },
+            "_expandable": {
+                "container": "/rest/api/space/DPCC",
+                "metadata": "",
+                "operations": "",
+                "children": "/rest/api/content/127484779/child",
+                "restrictions": "/rest/api/content/127484779/restriction/byOperation",
+                "history": "/rest/api/content/127484779/history",
+                "ancestors": "",
+                "body": "",
+                "version": "",
+                "descendants": "/rest/api/content/127484779/descendant",
+                "space": "/rest/api/space/DPCC"
+            }
+        }
+    ],
+    "body": {
+        "storage": {
+            "value": "<h1><strong>Version History</strong></h1><table class=\"relative-table\"><colgroup><col style=\"width: 62.0px;\" /><col style=\"width: 132.0px;\" /><col style=\"width: 84.0px;\" /><col style=\"width: 102.0px;\" /><col style=\"width: 120.0px;\" /></colgroup><thead><tr><th style=\"text-align: left;\"><p><strong>Name</strong></p></th><th style=\"text-align: left;\"><p><strong>Date</strong></p></th><th style=\"text-align: left;\"><p><strong>Reviewer&nbsp;</strong></p></th><th style=\"text-align: left;\"><p><strong>&nbsp;Description</strong></p></th><th colspan=\"1\" style=\"text-align: left;\"><p>Document Referred</p></th></tr></thead><tbody><tr><td style=\"text-align: left;\"><strong>Rudya S</strong></td><td style=\"text-align: left;\"><div class=\"content-wrapper\"><p><time datetime=\"2024-04-22\" /><strong>&nbsp;</strong></p></div></td><td style=\"text-align: left;\"><strong>Mubarak</strong></td><td style=\"text-align: left;\"><strong>Created the API to offer attachment Details.</strong></td><td colspan=\"1\" style=\"text-align: left;\"><strong>MTN&nbsp; Ivory Coast SOA Specifications Document_v3.24</strong></td></tr></tbody></table><h1><strong>API Description</strong></h1><p><strong>This API can be used to offer attachment details.</strong></p><p><br /></p><table class=\"relative-table\" style=\"width: 555.646px;\"><colgroup><col style=\"width: 72.75px;\" /><col style=\"width: 482.229px;\" /></colgroup><thead><tr><th style=\"text-align: left;\"><p><strong>South Bound</strong></p></th><th style=\"text-align: left;\"><p><strong>API Details</strong></p></th></tr></thead><tbody><tr><td colspan=\"1\" style=\"text-align: left;\"><p><strong>3PP</strong></p></td><td colspan=\"1\" style=\"text-align: left;\"><div class=\"content-wrapper\"><p><strong><span style=\"color: rgb(33,33,33);\"><a class=\"external-link\" href=\"http://10.4.3.95:7001/api/v1/customer-management/terminate\" rel=\"nofollow\" style=\"text-decoration: none;\">http://10.4.3.95:1221/offersubscription/v1/cs/charging/offer</a></span></strong></p></div></td></tr><tr><td colspan=\"1\" style=\"text-align: left;\"><strong>Method</strong></td><td colspan=\"1\" style=\"text-align: left;\"><strong>POST</strong></td></tr></tbody></table><h2 class=\"auto-cursor-target\"><strong>North bound details</strong></h2><p><strong>This API will be consumed by&nbsp;3PP.</strong></p><h1><strong>Technical Detail</strong></h1><h3><strong>HTTP METHOD</strong></h3><ul><li><strong>POST</strong></li></ul><h3><strong>URL</strong></h3><p><strong><span style=\"color: rgb(33,33,33);\"><a class=\"external-link\" href=\"https://mtngodc.ace.dev-rancher.tecnotree.com/dap-is/termination?lob=HPBX\" rel=\"nofollow\" style=\"text-decoration: none;\">https://{DAP_HOSTNAME}/dap-is/offerAttachment_TSAT</a></span></strong></p><p><strong><span style=\"color: rgb(255,0,0);\">Note:<span>&nbsp;</span></span></strong><span style=\"color: rgb(255,0,0);\">The host name of the endpoints is subject to change according to the environment it is deployed.</span></p><h2><strong>Input Parameters</strong></h2><table class=\"relative-table\"><colgroup><col style=\"width: 141.0px;\" /><col style=\"width: 229.0px;\" /><col style=\"width: 123.0px;\" /><col style=\"width: 94.0px;\" /><col style=\"width: 187.0px;\" /><col style=\"width: 89.0px;\" /></colgroup><thead><tr><th style=\"text-align: left;\"><p>Parameter Name</p></th><th style=\"text-align: left;\"><p>Description</p></th><th style=\"text-align: left;\"><p>Parameter Type</p></th><th style=\"text-align: left;\"><p>Mandatory</p></th><th style=\"text-align: left;\"><p>Sample Value</p></th><th style=\"text-align: left;\"><p>Data Type</p></th></tr></thead><tbody><tr><td colspan=\"1\" style=\"text-align: left;\"><span style=\"color: rgb(0,0,0);\"><strong>subscriberNumber</strong></span></td><td colspan=\"1\" style=\"text-align: left;\"><strong><span style=\"color: rgb(0,0,0);\">Represents the&nbsp;publicIdentifier/subscriberNumber</span></strong></td><td colspan=\"1\" style=\"text-align: left;\"><strong>Request</strong></td><td colspan=\"1\" style=\"text-align: left;\"><strong>Y</strong></td><td colspan=\"1\" style=\"text-align: left;\"><span style=\"color: rgb(0,0,0);\"><strong>9876543211</strong></span></td><td colspan=\"1\" style=\"text-align: left;\"><span style=\"color: rgb(0,51,102);\"><strong>String</strong></span></td></tr><tr><td colspan=\"1\"><strong>OfferId</strong></td><td colspan=\"1\"><strong><span style=\"color: rgb(0,0,0);\">Represents the&nbsp;&nbsp;</span>OfferId</strong></td><td colspan=\"1\"><strong>Request</strong></td><td colspan=\"1\"><strong>Y</strong></td><td colspan=\"1\"><strong>20390</strong></td><td colspan=\"1\"><span style=\"color: rgb(0,51,102);\"><strong>String</strong></span></td></tr></tbody></table><h2><strong>Output Parameters</strong></h2><table class=\"relative-table\"><thead><tr><th style=\"text-align: left;\"><p><strong>Parameter Name</strong></p></th><th style=\"text-align: left;\"><p><strong>Description</strong></p></th><th style=\"text-align: left;\"><p><strong>Parameter Type</strong></p></th><th style=\"text-align: left;\"><p><strong>Sample Value</strong></p></th><th style=\"text-align: left;\"><p><strong>Data Type</strong></p></th></tr><tr><td style=\"text-align: left;\"><p><strong>responseCode</strong></p></td><td style=\"text-align: left;\"><span style=\"color: rgb(0,51,102);\"><strong>Represents the code</strong></span></td><td style=\"text-align: left;\"><span style=\"color: rgb(0,51,102);\"><strong>Response</strong></span></td><td style=\"text-align: left;\"><p><span style=\"color: rgb(0,51,102);\"><strong>0</strong></span></p></td><td style=\"text-align: left;\"><span style=\"color: rgb(0,51,102);\"><strong>string</strong></span></td></tr><tr><td style=\"text-align: left;\"><p><br /></p><p><strong>responseMessage</strong></p></td><td style=\"text-align: left;\"><span style=\"color: rgb(0,51,102);\"><strong>Represents the message returned for the response</strong></span></td><td style=\"text-align: left;\"><span style=\"color: rgb(0,51,102);\"><strong>Response</strong></span></td><td style=\"text-align: left;\"><p><strong>Success</strong></p></td><td style=\"text-align: left;\"><span style=\"color: rgb(0,51,102);\"><strong>string</strong></span></td></tr><tr><td style=\"text-align: left;\"><p><strong>createdOn</strong></p></td><td style=\"text-align: left;\"><span style=\"color: rgb(0,51,102);\"><strong>Represents the date of creation and time</strong></span></td><td style=\"text-align: left;\"><span style=\"color: rgb(0,51,102);\"><strong>Response</strong></span></td><td style=\"text-align: left;\"><p><strong><span style=\"color: rgb(0,0,0);\">2022-07-10T05:57:01</span></strong></p></td><td style=\"text-align: left;\"><p><span style=\"color: rgb(0,51,102);\"><strong>String</strong></span></p></td></tr><tr><td style=\"text-align: left;\"><p><strong>transactionId</strong></p></td><td style=\"text-align: left;\"><span style=\"color: rgb(0,51,102);\"><strong>Represents the transaction Id</strong></span></td><td style=\"text-align: left;\"><span style=\"color: rgb(0,51,102);\"><strong>Response</strong></span></td><td style=\"text-align: left;\"><p><strong><span style=\"color: rgb(0,0,0);\">1000</span></strong></p><p><br /></p></td><td style=\"text-align: left;\"><span style=\"color: rgb(0,51,102);\"><strong>String</strong></span></td></tr></thead></table><h1><strong>Sample Request</strong></h1><p><br /><br /><br /></p><table class=\"relative-table\" style=\"width: 437.037px;\"><colgroup><col style=\"width: 0.0px;\" /></colgroup><tbody><tr><th style=\"text-align: left;\">{<br />&quot;clientRequest&quot;: {<br />&quot;EaiEnvelope&quot;: {<br />&quot;ApplicationName&quot;: &quot;MTNN&quot;,<br />&quot;Domain&quot;: &quot;EIA&quot;,<br />&quot;Service&quot;: &quot;Cs3Services&quot;,<br />&quot;OperationName&quot;: &quot;active&quot;,<br />&quot;Sender&quot;: &quot;testuser3&quot;,<br />&quot;MessageId&quot;: 1616752614124,<br />&quot;Language&quot;: &quot;En&quot;,<br />&quot;UserId&quot;: &quot;testuser3&quot;,<br />&quot;CorrelationId&quot;: 1616752614124,<br />&quot;ReqTimeStamp&quot;: &quot;2021-03-26T09:56:54.124Z&quot;,<br />&quot;Payload&quot;: {<br />&quot;Cs3&quot;: {<br />&quot;Request&quot;: {<br />&quot;CustDetails_InputData&quot;: {<br />&quot;MSISDN&quot;: &quot;9062058853&quot;<br />},<br />&quot;OfferDetails_InputData&quot;: {<br />&quot;OfferId&quot;: &quot;20390&quot;<br />},<br />&quot;OfferDetails&quot;: {<br />&quot;TransactionId&quot;: &quot;1233&quot;<br />}<br />}<br />}<br />}<br />}<br />}<br />}</th></tr></tbody></table><p><br /></p><h1><strong>Sample Response</strong></h1><h2 class=\"auto-cursor-target\"><strong>Sample - Success Response</strong></h2><table class=\"relative-table\" style=\"width: 437.037px;\"><colgroup><col style=\"width: 0.0px;\" /></colgroup><tbody><tr><th style=\"text-align: left;\">{{<br />&quot;clientRequestResponse&quot;: {<br />&quot;EaiEnvelope&quot;: {<br />&quot;ApplicationName&quot;: &quot;MTNN&quot;,<br />&quot;Domain&quot;: &quot;EIA&quot;,<br />&quot;Service&quot;: &quot;Cs3Services&quot;,<br />&quot;OperationName&quot;: &quot;active&quot;,<br />&quot;Sender&quot;: &quot;testuser3&quot;,<br />&quot;MessageId&quot;: 1616752614124,<br />&quot;Language&quot;: &quot;En&quot;,<br />&quot;UserId&quot;: &quot;testuser3&quot;,<br />&quot;CorrelationId&quot;: 1616752614124,<br />&quot;Payload&quot;: {<br />&quot;Cs3&quot;: {<br />&quot;Response&quot;: {<br />&quot;ResultOutputData&quot;: {<br />&quot;ResultCode&quot;: &quot;0&quot;,<br />&quot;ResultMessage&quot;: &quot;Success&quot;,<br />&quot;Reference_ID&quot;: &quot;1234&quot;<br />}<br />}<br />}<br />}<br />}<br />}<br />}<br />&quot;Cs3&quot;: {<br />&quot;Response&quot;: {<br />&quot;ResultOutputData&quot;: {<br />&quot;ResultCode&quot;: &quot;0&quot;,<br />&quot;ResultMessage&quot;: &quot;Success&quot;,<br />&quot;Reference_ID&quot;: &quot;1234&quot;<br />}<br />}<br />}<br />}</th></tr></tbody></table><p><br /></p>",
+            "representation": "storage",
+            "_expandable": {
+                "content": "/rest/api/content/150710119"
+            }
+        },
+        "_expandable": {
+            "editor": "",
+            "view": "",
+            "export_view": "",
+            "styled_view": "",
+            "anonymous_export_view": ""
+        }
+    },
+    "metadata": {
+        "labels": {
+            "results": [],
+            "start": 0,
+            "limit": 200,
+            "size": 0,
+            "_links": {
+                "self": "https://wiki.tecnotree.com/confluence/rest/api/content/150710119/label"
+            }
+        },
+        "_expandable": {
+            "currentuser": "",
+            "properties": "",
+            "frontend": "",
+            "editorHtml": ""
+        }
+    },
+    "extensions": {
+        "position": "none"
+    },
+    "_links": {
+        "webui": "/display/DPCC/41-Offer+Attachment_TSAT",
+        "edit": "/pages/resumedraft.action?draftId=150710119&draftShareId=938dbaca-b600-4fe1-9403-529ea5ae875a",
+        "tinyui": "/x/Z6f7C",
+        "collection": "/rest/api/content",
+        "base": "https://wiki.tecnotree.com/confluence",
+        "context": "/confluence",
+        "self": "https://wiki.tecnotree.com/confluence/rest/api/content/150710119"
+    },
+    "_expandable": {
+        "container": "/rest/api/space/DPCC",
+        "operations": "",
+        "children": "/rest/api/content/150710119/child",
+        "restrictions": "/rest/api/content/150710119/restriction/byOperation",
+        "descendants": "/rest/api/content/150710119/descendant",
+        "space": "/rest/api/space/DPCC"
+    }
+}

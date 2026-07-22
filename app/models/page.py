@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class Page(BaseModel):
@@ -9,10 +10,18 @@ class Page(BaseModel):
 
     space: str
 
-    url: str
+    url: Optional[str] = None
 
-    version: int | None = None
+    parent_id: Optional[str] = None
 
-    created_date: str | None = None
+    status: Optional[str] = None
 
-    updated_date: str | None = None
+    version: Optional[int] = None
+
+    created_by: Optional[str] = None
+
+    created_date: Optional[str] = None
+
+    updated_by: Optional[str] = None
+
+    updated_date: Optional[str] = None

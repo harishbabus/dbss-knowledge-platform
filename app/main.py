@@ -1,30 +1,26 @@
-from app.crawler.inventory import InventoryCrawler
+from app.crawler.inventory import KnowledgeCrawler
+
 from app.utils.logger import logger
+
 
 
 def main():
 
-    logger.info("Starting DBSS Knowledge Platform ingestion")
 
-    crawler = InventoryCrawler()
+    crawler = KnowledgeCrawler()
 
-    result = crawler.crawl_pages(start_page=0, max_pages=None, page_limit=100)
 
-    logger.info("Inventory completed")
+    result = crawler.run(
+        batch_size=100
+    )
 
-    logger.info(f"""
-==============================
-SYNC SUMMARY
 
-Processed : {result["processed"]}
-Inserted  : {result["inserted"]}
-Updated   : {result["updated"]}
-Unchanged : {result["unchanged"]}
-Duplicates: {result["duplicates"]}
+    logger.info(
+        result
+    )
 
-==============================
-""")
 
 
 if __name__ == "__main__":
+
     main()
