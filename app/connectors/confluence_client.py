@@ -12,19 +12,10 @@ class ConfluenceClient:
         self.base_url = settings.CONFLUENCE_URL
 
         self.client = httpx.Client(
-            auth=(
-                settings.USERNAME,
-                settings.PASSWORD
-            ),
-            timeout=60
+            auth=(settings.USERNAME, settings.PASSWORD), timeout=60
         )
 
-
-    def get_pages(
-        self,
-        start=0,
-        limit=100
-    ):
+    def get_pages(self, start=0, limit=100):
 
         url = (
             f"{self.base_url}"
@@ -33,48 +24,31 @@ class ConfluenceClient:
             f"/content/page"
         )
 
-        params = {
-            "start": start,
-            "limit": limit
-        }
-
+        params = {"start": start, "limit": limit}
 
         retries = 3
-
 
         for attempt in range(1, retries + 1):
 
             try:
 
-                logger.info(
-                    f"API request attempt {attempt}"
-                )
+                logger.info(f"API request attempt {attempt}")
 
-
-                response = self.client.get(
-                    url,
-                    params=params
-                )
+                response = self.client.get(url, params=params)
 
                 response.raise_for_status()
 
                 return response.json()
 
-
             except httpx.RequestError as e:
 
-                logger.warning(
-                    f"Request failed: {e}"
-                )
-
+                logger.warning(f"Request failed: {e}")
 
                 if attempt < retries:
 
                     wait_time = attempt * 5
 
-                    logger.info(
-                        f"Retrying after {wait_time}s"
-                    )
+                    logger.info(f"Retrying after {wait_time}s")
 
                     time.sleep(wait_time)
 

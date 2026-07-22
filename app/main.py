@@ -1,22 +1,29 @@
 from app.crawler.inventory import InventoryCrawler
-from app.storage.csv_writer import save_pages
+from app.utils.logger import logger
 
 
 def main():
 
-    print("Starting Confluence crawl...")
+    logger.info("Starting DBSS Knowledge Platform ingestion")
 
     crawler = InventoryCrawler()
 
-    count = crawler.crawl_pages()
+    result = crawler.crawl_pages(start_page=0, max_pages=None, page_limit=100)
 
-    print(
-        f"Pages processed: {count}"
-    )
+    logger.info("Inventory completed")
 
-    save_pages(pages, "data/inventory/confluence_inventory.csv")
+    logger.info(f"""
+==============================
+SYNC SUMMARY
 
-    print("Inventory completed")
+Processed : {result["processed"]}
+Inserted  : {result["inserted"]}
+Updated   : {result["updated"]}
+Unchanged : {result["unchanged"]}
+Duplicates: {result["duplicates"]}
+
+==============================
+""")
 
 
 if __name__ == "__main__":

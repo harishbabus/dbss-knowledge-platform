@@ -64,8 +64,7 @@ class InventoryCrawler:
                 if page_id in seen_ids:
                     duplicate_count += 1
                     logger.warning(
-                        f"Duplicate page encountered "
-                        f"within current run: {page_id}"
+                        f"Duplicate page encountered " f"within current run: {page_id}"
                     )
                 else:
                     seen_ids.add(page_id)
@@ -93,16 +92,10 @@ class InventoryCrawler:
 
                 total_processed += 1
 
-                if (
-                    max_pages is not None
-                    and total_processed >= max_pages
-                ):
-                    logger.info(
-                        "Maximum page limit reached."
-                    )
+                if max_pages is not None and total_processed >= max_pages:
+                    logger.info("Maximum page limit reached.")
 
-                    logger.info(
-                        f"""
+                    logger.info(f"""
 ================ SUMMARY ================
 
 Processed : {total_processed}
@@ -112,8 +105,7 @@ Unchanged : {unchanged}
 Duplicates : {duplicate_count}
 
 =========================================
-"""
-                    )
+""")
 
                     return {
                         "processed": total_processed,
@@ -144,8 +136,7 @@ Duplicates : {duplicate_count}
         logger.info("Confluence Crawl Completed")
         logger.info("=" * 80)
 
-        logger.info(
-            f"""
+        logger.info(f"""
 ================ FINAL SUMMARY ================
 
 Total Processed : {total_processed}
@@ -159,8 +150,7 @@ Unchanged       : {unchanged}
 Duplicates      : {duplicate_count}
 
 ===============================================
-"""
-        )
+""")
 
         return {
             "processed": total_processed,

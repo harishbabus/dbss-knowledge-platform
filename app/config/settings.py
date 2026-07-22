@@ -14,17 +14,11 @@ class Settings:
 
     PASSWORD = os.getenv("PASSWORD")
 
-    PAGE_LIMIT = int(
-        os.getenv("PAGE_LIMIT", 100)
-    )
+    PAGE_LIMIT = int(os.getenv("PAGE_LIMIT", 100))
 
-    MONGODB_URL = os.getenv(
-        "MONGODB_URL"
-    )
+    MONGODB_URL = os.getenv("MONGODB_URL")
 
-    DATABASE_NAME = os.getenv(
-        "DATABASE_NAME"
-    )
+    DATABASE_NAME = os.getenv("DATABASE_NAME")
 
 
 settings = Settings()

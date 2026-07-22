@@ -8,9 +8,7 @@ class PageRepository:
 
     def __init__(self):
 
-        self.collection: Collection = mongodb.collection(
-            "pages"
-        )
+        self.collection: Collection = mongodb.collection("pages")
 
     def save_page(self, page):
 
@@ -19,11 +17,7 @@ class PageRepository:
         document["_id"] = document.pop("id")
 
         result = self.collection.replace_one(
-            {
-                "_id": document["_id"]
-            },
-            document,
-            upsert=True
+            {"_id": document["_id"]}, document, upsert=True
         )
 
         if result.upserted_id:
@@ -40,16 +34,10 @@ class PageRepository:
 
     def find_by_page_id(self, page_id):
 
-        return self.collection.find_one(
-            {
-                "id": page_id
-            }
-        )
+        return self.collection.find_one({"id": page_id})
 
     def delete_all(self):
 
         result = self.collection.delete_many({})
 
-        logger.info(
-            f"Deleted {result.deleted_count} pages"
-        )
+        logger.info(f"Deleted {result.deleted_count} pages")
