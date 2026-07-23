@@ -14,4 +14,6 @@ class AttachmentContent(BaseModel):
 
     text: Optional[str] = None
 
+    file_path: Optional[str] = None
+
     content_hash: Optional[str] = None

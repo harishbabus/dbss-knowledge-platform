@@ -8,11 +8,7 @@ from app.models.page_content import PageContent
 
 class PageExtractor:
 
-
-    def extract(
-        self,
-        data: dict
-    ):
+    def extract(self, data: dict):
 
         page = self._extract_page(data)
 
@@ -20,234 +16,106 @@ class PageExtractor:
 
         return page, content
 
+    def _extract_page(self, data: dict):
 
-
-    def _extract_page(
-        self,
-        data: dict
-    ):
-
-        ancestors = data.get(
-            "ancestors",
-            []
-        )
+        ancestors = data.get("ancestors", [])
 
         parent_id = None
 
         if ancestors:
-            parent_id = ancestors[-1].get(
-                "id"
-            )
+            parent_id = ancestors[-1].get("id")
 
+        history = data.get("history", {})
 
-        history = data.get(
-            "history",
-            {}
-        )
+        version_info = data.get("version", {})
 
+        created_by = history.get("createdBy", {}).get("displayName")
 
-        version_info = data.get(
-            "version",
-            {}
-        )
+        created_date = history.get("createdDate")
 
+        updated_by = version_info.get("by", {}).get("displayName")
 
-        created_by = (
-            history
-            .get("createdBy", {})
-            .get("displayName")
-        )
+        updated_date = version_info.get("when")
 
+        version = version_info.get("number")
 
-        created_date = history.get(
-            "createdDate"
-        )
+        links = data.get("_links", {})
 
+        base_url = links.get("base", "")
 
-        updated_by = (
-            version_info
-            .get("by", {})
-            .get("displayName")
-        )
+        web_ui = links.get("webui", "")
 
-
-        updated_date = version_info.get(
-            "when"
-        )
-
-
-        version = version_info.get(
-            "number"
-        )
-
-
-        links = data.get(
-            "_links",
-            {}
-        )
-
-
-        base_url = links.get(
-            "base",
-            ""
-        )
-
-        web_ui = links.get(
-            "webui",
-            ""
-        )
-
-
-        url = (
-            base_url + web_ui
-            if web_ui
-            else None
-        )
-
+        url = base_url + web_ui if web_ui else None
 
         return Page(
-
-            id=str(
-                data["id"]
-            ),
-
-            title=data.get(
-                "title"
-            ),
-
+            id=str(data["id"]),
+            title=data.get("title"),
             space="DPCC",
-
             url=url,
-
             parent_id=parent_id,
-
-            status=data.get(
-                "status"
-            ),
-
+            status=data.get("status"),
             version=version,
-
             created_by=created_by,
-
             created_date=created_date,
-
             updated_by=updated_by,
-
-            updated_date=updated_date
-
+            updated_date=updated_date,
         )
 
+    def _extract_content(self, data: dict):
 
+        html = data.get("body", {}).get("storage", {}).get("value", "")
 
-    def _extract_content(
-        self,
-        data: dict
-    ):
+        soup = BeautifulSoup(html, "html.parser")
 
-        html = (
-            data
-            .get("body", {})
-            .get("storage", {})
-            .get("value", "")
-        )
+        text = soup.get_text(separator="\n")
 
+        headings = self._extract_headings(soup)
 
-        soup = BeautifulSoup(
-            html,
-            "html.parser"
-        )
+        tables = self._extract_tables(soup)
 
+        code_blocks = self._extract_code_blocks(soup)
 
-        text = soup.get_text(
-            separator="\n"
-        )
+        links = self._extract_links(soup)
 
-        headings = self._extract_headings(
-            soup
-        )
+        macros = self._extract_macros(soup)
 
-        tables = self._extract_tables(
-            soup
-        )
-
-        code_blocks = self._extract_code_blocks(
-            soup
-        )
-
-        links = self._extract_links(
-            soup
-        )
-
-        macros = self._extract_macros(
-            soup
-        )
-
-
-        content_hash = hashlib.sha256(
-            text.encode("utf-8")
-        ).hexdigest()
-
+        content_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
 
         return PageContent(
-
-            page_id=str(
-                data["id"]
-            ),
-
+            page_id=str(data["id"]),
             raw_html=html,
-
             plain_text=text.strip(),
-
             headings=headings,
-
             tables=tables,
-
             code_blocks=code_blocks,
-
             links=links,
-
             macros=macros,
-
-            content_hash=content_hash
-
+            content_hash=content_hash,
         )
 
     def _extract_tables(self, soup):
 
         tables = []
 
-
         for table in soup.find_all("table"):
 
             rows = []
 
-
             for tr in table.find_all("tr"):
 
                 cells = [
-                    cell.get_text(
-                        " ",
-                        strip=True
-                    )
-                    for cell in tr.find_all(
-                        ["th", "td"]
-                    )
+                    cell.get_text(" ", strip=True) for cell in tr.find_all(["th", "td"])
                 ]
-
 
                 if cells:
                     rows.append(cells)
 
-
             if not rows:
                 continue
 
-
             headers = rows[0]
 
-
             data_rows = []
-
 
             for row in rows[1:]:
 
@@ -257,78 +125,37 @@ class PageExtractor:
 
                     if index < len(headers):
 
-                        item[
-                            headers[index]
-                        ] = value
-
+                        item[headers[index]] = value
 
                 data_rows.append(item)
 
-
-            tables.append(
-                {
-                    "headers": headers,
-
-                    "rows": data_rows
-                }
-            )
-
+            tables.append({"headers": headers, "rows": data_rows})
 
         return tables
 
-    def _extract_code_blocks(
-        self,
-        soup
-    ):
+    def _extract_code_blocks(self, soup):
 
         blocks = []
 
+        for macro in soup.find_all("ac:structured-macro"):
 
-        for macro in soup.find_all(
-            "ac:structured-macro"
-        ):
-
-            name = macro.get(
-                "ac:name"
-            )
-
+            name = macro.get("ac:name")
 
             if name == "code":
 
-                body = macro.find(
-                    "ac:plain-text-body"
-                )
-
+                body = macro.find("ac:plain-text-body")
 
                 language = None
 
-
-                parameter = macro.find(
-                    "ac:parameter"
-                )
-
+                parameter = macro.find("ac:parameter")
 
                 if parameter:
 
-                    language = (
-                        parameter
-                        .get_text(
-                            strip=True
-                        )
-                    )
-
+                    language = parameter.get_text(strip=True)
 
                 if body:
 
-                    blocks.append(
-                        {
-                            "language": language,
-
-                            "content":
-                            body.get_text()
-                        }
-                    )
-
+                    blocks.append({"language": language, "content": body.get_text()})
 
         return blocks
 
@@ -336,14 +163,9 @@ class PageExtractor:
 
         headings = []
 
-        for tag in soup.find_all(
-            ["h1", "h2", "h3", "h4"]
-        ):
+        for tag in soup.find_all(["h1", "h2", "h3", "h4"]):
 
-            text = tag.get_text(
-                " ",
-                strip=True
-            )
+            text = tag.get_text(" ", strip=True)
 
             if text:
                 headings.append(text)
@@ -356,23 +178,13 @@ class PageExtractor:
 
         for link in soup.find_all("a"):
 
-            href = link.get(
-                "href"
-            )
+            href = link.get("href")
 
-            text = link.get_text(
-                " ",
-                strip=True
-            )
+            text = link.get_text(" ", strip=True)
 
             if href:
 
-                links.append(
-                    {
-                        "text": text,
-                        "url": href
-                    }
-                )
+                links.append({"text": text, "url": href})
 
         return links
 
@@ -380,25 +192,14 @@ class PageExtractor:
 
         macros = []
 
-        for macro in soup.find_all(
-            "ac:structured-macro"
-        ):
+        for macro in soup.find_all("ac:structured-macro"):
 
-            name = macro.get(
-                "ac:name"
-            )
+            name = macro.get("ac:name")
 
             if name:
 
                 macros.append(
-                    {
-                        "type": name,
-                        "content":
-                            macro.get_text(
-                                " ",
-                                strip=True
-                            )
-                    }
+                    {"type": name, "content": macro.get_text(" ", strip=True)}
                 )
 
         return macros

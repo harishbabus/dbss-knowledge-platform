@@ -1,13 +1,9 @@
 from app.connectors.confluence_client import ConfluenceClient
 
-
 client = ConfluenceClient()
 
 
-response = client.get_pages(
-    start=0,
-    limit=5
-)
+response = client.get_pages(start=0, limit=5)
 
 
 for page in response["results"]:

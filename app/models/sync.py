@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
 
 class SyncHistory(BaseModel):
@@ -8,10 +9,14 @@ class SyncHistory(BaseModel):
 
     status: str
 
-    started_at: str
+    started_at: datetime
 
-    completed_at: Optional[str] = None
+    completed_at: Optional[datetime] = None
+
+    processed_count: int = 0
+
+    failed_count: int = 0
 
     last_processed_page: Optional[str] = None
 
-    processed_count: int = 0
+    error_message: Optional[str] = None

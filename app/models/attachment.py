@@ -2,7 +2,6 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 
-
 class Attachment(BaseModel):
 
     id: str
@@ -11,16 +10,13 @@ class Attachment(BaseModel):
 
     filename: str
 
-
     media_type: Optional[str] = None
 
     size: Optional[int] = None
 
-
     download_url: Optional[str] = None
 
     thumbnail_url: Optional[str] = None
-
 
     status: Optional[str] = None
 
