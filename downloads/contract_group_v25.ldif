@@ -1,0 +1,84 @@
+# User digitalcontractAgent Creation with specific permissions
+dn: cn=digitalcontractAgent,ou=Group,cn=%ldap.domain%,ou=Domains,%ldap.base%
+cn: digitalcontractAgent
+objectClass: tecnoRole
+
+permission:contractmanagement.cms.baseProducts.v1.create
+permission:contractmanagement.cms.baseProducts.v1.read
+permission:contractmanagement.cms.baseProducts.v1.readAll
+permission:contractmanagement.cms.baseProducts.v1.update
+permission:contractmanagement.cms.baseProducts.v1.partialUpdate
+
+permission:contractmanagement.cms.clauseTypes.v1.create
+permission:contractmanagement.cms.clauseTypes.v1.read
+permission:contractmanagement.cms.clauseTypes.v1.readAll
+permission:contractmanagement.cms.clauseTypes.v1.update
+permission:contractmanagement.cms.clauseTypes.v1.partialUpdate
+
+permission:contractmanagement.cms.contracts.v1.create
+permission:contractmanagement.cms.contracts.v1.read
+permission:contractmanagement.cms.contracts.v1.readAll
+permission:contractmanagement.cms.contracts.v1.update
+permission:contractmanagement.cms.contracts.v1.partialUpdate
+
+permission:contractmanagement.cms.templateLibrary.v1.create
+permission:contractmanagement.cms.templateLibrary.v1.read
+permission:contractmanagement.cms.templateLibrary.v1.readAll
+permission:contractmanagement.cms.templateLibrary.v1.update
+permission:contractmanagement.cms.templateLibrary.v1.partialUpdate
+
+permission:contractmanagement.cms.recipientDetails.v1.create
+permission:contractmanagement.cms.recipientDetails.v1.read
+permission:contractmanagement.cms.recipientDetails.v1.readAll
+permission:contractmanagement.cms.recipientDetails.v1.update
+permission:contractmanagement.cms.recipientDetails.v1.partialUpdate
+
+permission:contractmanagement.cms.fileUploads.v1.create
+permission:contractmanagement.cms.fileUploads.v1.read
+permission:contractmanagement.cms.fileUploads.v1.readAll
+permission:contractmanagement.cms.fileUploads.v1.update
+permission:contractmanagement.cms.fileUploads.v1.partialUpdate
+
+
+# User digitalcontractMgnr Creation with specific permissions
+dn: cn=digitalcontractMgnr,ou=Group,cn=%ldap.domain%,ou=Domains,%ldap.base%
+cn: digitalcontractMgnr
+objectClass: tecnoRole
+
+
+permission:contractmanagement.cms.baseProducts.v1.create
+permission:contractmanagement.cms.baseProducts.v1.read
+permission:contractmanagement.cms.baseProducts.v1.readAll
+permission:contractmanagement.cms.baseProducts.v1.update
+permission:contractmanagement.cms.baseProducts.v1.partialUpdate
+
+
+permission:contractmanagement.cms.clauseTypes.v1.create
+permission:contractmanagement.cms.clauseTypes.v1.read
+permission:contractmanagement.cms.clauseTypes.v1.readAll
+permission:contractmanagement.cms.clauseTypes.v1.update
+permission:contractmanagement.cms.clauseTypes.v1.partialUpdate
+
+permission:contractmanagement.cms.contracts.v1.create
+permission:contractmanagement.cms.contracts.v1.read
+permission:contractmanagement.cms.contracts.v1.readAll
+permission:contractmanagement.cms.contracts.v1.update
+permission:contractmanagement.cms.contracts.v1.partialUpdate
+
+permission:contractmanagement.cms.templateLibrary.v1.create
+permission:contractmanagement.cms.templateLibrary.v1.read
+permission:contractmanagement.cms.templateLibrary.v1.readAll
+permission:contractmanagement.cms.templateLibrary.v1.update
+permission:contractmanagement.cms.templateLibrary.v1.partialUpdate
+
+permission:contractmanagement.cms.recipientDetails.v1.create
+permission:contractmanagement.cms.recipientDetails.v1.read
+permission:contractmanagement.cms.recipientDetails.v1.readAll
+permission:contractmanagement.cms.recipientDetails.v1.update
+permission:contractmanagement.cms.recipientDetails.v1.partialUpdate
+
+permission:contractmanagement.cms.fileUploads.v1.create
+permission:contractmanagement.cms.fileUploads.v1.read
+permission:contractmanagement.cms.fileUploads.v1.readAll
+permission:contractmanagement.cms.fileUploads.v1.update
+permission:contractmanagement.cms.fileUploads.v1.partialUpdate

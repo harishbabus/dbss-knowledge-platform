@@ -35,3 +35,7 @@ class Attachment(BaseModel):
     content: Optional[str] = None
 
     content_hash: Optional[str] = None
+
+    page_title: Optional[str] = None
+
+    indexed: bool = False

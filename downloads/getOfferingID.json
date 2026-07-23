@@ -1,0 +1,117 @@
+{
+    "DAP_GS_SERVICES": [
+        {
+            "_id": "685503916d312592e9cc1ccb",
+            "Service": {
+                "serviceId": 1046,
+                "serviceName": "getOfferingID",
+                "serviceDesc": "getOfferingID",
+                "groupName": "OmanTel",
+                "inputValidation": false,
+                "outputMapping": false,
+                "scriptOperation": false,
+                "ssoValidation": false,
+                "api_access": false,
+                "payloadRequiredInLog": true,
+                "dbLogging": false,
+                "soapTransformation": false,
+                "Input": {
+                    "type": "object",
+                    "allowAdditionalProperties": false,
+                    "properties": {}
+                },
+                "showInputValPopup": false,
+                "isDropdownDisplayed": false,
+                "showOutputMappingPopup": false,
+                "showAdvancedConfig": false,
+                "Action": {
+                    "NodeId": "2687",
+                    "timeout": 0,
+                    "scriptAction": {
+                        "action": "",
+                        "inputValidation": {
+                            "fileName": "",
+                            "functionName": "",
+                            "condition": ""
+                        },
+                        "outputValidation": {
+                            "fileName": "",
+                            "functionName": ""
+                        }
+                    },
+                    "REST": {},
+                    "SOAP": {
+                        "requestPayload": {}
+                    },
+                    "DB": {
+                        "queryId": [
+                            "getOfferingID"
+                        ],
+                        "singleSessionFlag": false
+                    }
+                },
+                "Output": {
+                    "payload": {
+                        "key": "value"
+                    }
+                },
+                "createdOn": "2025-06-20T06:44:29.147Z",
+                "modifiedOn": "2025-06-27T10:56:47.626Z",
+                "modifiedBy": "dapadminuser",
+                "inputType": "S",
+                "exampleInputJson": "",
+                "labelWidth": 0,
+                "isValidService": true,
+                "serviceStatus": "Successfully Verified"
+            },
+            "lastRefreshed": "2025-06-27T10:57:35.033Z"
+        }
+    ],
+    "DAP_GS_NODE": [
+        {
+            "_id": "64ae690ee6056fab4ade38a6",
+            "Node": {
+                "Protocol": "MYSQL",
+                "NodeId": "2687",
+                "NodeName": "MYSQL_DB_NGB",
+                "NodeDesc": "MYSQLCOLLECTION",
+                "userName": "dcbs_dev_collections",
+                "password": "¤£´ ¥¦· ¤°­­¦¤µª°¯´rstA",
+                "minPoolSize": 2,
+                "maxPoolSize": 50,
+                "createdOn": "2023-01-20T06:27:02.980Z",
+                "modifiedOn": "2025-06-13T09:21:38.989Z",
+                "ConnectionType": "Basic",
+                "dbName": "dcbs_dev_collections",
+                "Ip": "172.20.21.214",
+                "Port": "3306"
+            }
+        }
+    ],
+    "DAP_GS_QUERY": [
+        {
+            "_id": "6855037964edfde94cae566f",
+            "Query": {
+                "queryId": "getOfferingID",
+                "description": "getOfferingID",
+                "db": "MYSQL",
+                "query": "select bin_to_uuid(OFFERING_ID) offeringID from OFFERINGS where OFFERING_CODE = (SELECT MAIN_OFFER_CODE FROM VE_BUSINESS_PLAN_LINKS where OPTIONAL_OFFER_CODE={:String|requestMap.oldPlan})\nunion all\nselect bin_to_uuid(OFFERING_ID) offeringID from OFFERINGS WHERE OFFERING_CODE = {:String|requestMap.oldPlan};",
+                "operation": "Select",
+                "NodeId": "2687",
+                "createdOn": "",
+                "modifiedOn": "2025-06-27T10:57:29.343Z"
+            }
+        }
+    ],
+    "DAP_PROCESS_GROUP": [
+        {
+            "_id": "67f8af2ce11825daec02c06d",
+            "GroupID": "8953",
+            "GroupName": "OmanTel",
+            "GroupDesc": "OmanTel",
+            "createdOn": "2025-04-11T05:56:49.297Z",
+            "modifiedOn": "",
+            "modifiedBy": ""
+        }
+    ]
+}

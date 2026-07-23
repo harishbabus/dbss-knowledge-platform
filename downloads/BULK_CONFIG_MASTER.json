@@ -1,0 +1,67 @@
+[{
+  "_id": {
+    "$oid": "6911768324c6c65852d3ad5d"
+  },
+  "ServiceName": "portin-rsp-bulk-service",
+  "groupName": "",
+  "BulkID": 26,
+  "BulkType": "DB-MONGO",
+  "Action": {
+    "CompressEnable": false,
+    "CompressFormat": ".tar.gz",
+    "QuotedStringEnable": true,
+    "SftpPath": "",
+    "Protocol": "REST",
+    "Method": "POST",
+    "EndPoint": "http://dap-integration-service-is.dit-dap-ns:80/dap-is/closeRspPortinTask",
+    "RequestFormat": {
+      "msisdn": "{:1}",
+      "status": "{:2}",
+      "type": "portIn",
+      "taskStatus": "dummy"
+    },
+    "Headers": {
+      "select": []
+    },
+    "PlaceholderType": 1,
+    "IsAuthenticationRequired": true,
+    "username": "professor",
+    "localSubPath": ""
+  },
+  "MONGODBParameters": {
+    "FetchSize": 1,
+    "NodeId": "5700",
+    "collectionName": "VE_PORTIN_MSISDN",
+    "MongoDbQuery": "{  \"status\": \"pending\"}",
+    "returnParams": {
+      "key": "value"
+    },
+    "Order": [
+      "{:_id}",
+      "{:msisdn}",
+      "{:status}",
+      "{:operation}",
+      "{:insertedDate}"
+    ],
+    "StopLimit": 0,
+    "OffsetEnable": false,
+    "aggregateEnabled": false,
+    "nullHandler": false
+  },
+  "processCompletionIntimation": {
+    "Notify": false,
+    "intimateProcessCompletion": {
+      "RestEndoint": "",
+      "Method": "GET",
+      "Payload": {
+        "key1": "value1",
+        "key2": "{:requestMap.path}",
+        "key3": "{:headerMap.path}"
+      }
+    }
+  },
+  "enrichData": {
+    "enrichEnable": false
+  },
+  "_class": "com.tecnotree.dap.bulk.document.BulkMasterConfigurationDocument"
+}]

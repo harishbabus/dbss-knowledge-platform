@@ -1,0 +1,155 @@
+####################### Permissions ###################
+############## DIGITAL CONTRACT MANAGEMENT ################
+
+
+# 1. getAllcontractById
+dn: cn=contractmanagement.cms.contracts.v1.read,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.contracts.v1.read
+objectClass: device
+
+# 2 getAllcontract
+dn: cn=contractmanagement.cms.contracts.v1.readAll,ou=Permissions,%ldap.base%
+cn:contractmanagement.cms.contracts.v1.readAll
+objectClass: device
+
+# 3.createcontract
+dn: cn=contractmanagement.cms.contracts.v1.create,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.contracts.v1.create
+objectClass: device
+
+# 4.putcontract
+dn: cn=contractmanagement.cms.contracts.v1.update,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.contracts.v1.update
+objectClass: device
+
+# 5.patchcontract
+dn: cn=contractmanagement.cms.contracts.v1.partialUpdate,ou=Permissions,%ldap.base%
+cn:contractmanagement.cms.contracts.v1.partialUpdate
+objectClass: device
+
+# 6. getAllbaseProductsById
+dn: cn=contractmanagement.cms.baseProducts.v1.read,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.baseProducts.v1.read
+objectClass: device
+
+# 7 getAllbaseProducts
+dn: cn=contractmanagement.cms.baseProducts.v1.readAll,ou=Permissions,%ldap.base%
+cn:contractmanagement.cms.baseProducts.v1.readAll
+objectClass: device
+
+# 8.createbaseProducts
+dn: cn=contractmanagement.cms.baseProducts.v1.create,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.baseProducts.v1.create
+objectClass: device
+
+# 9.putbaseProducts
+dn: cn=contractmanagement.cms.baseProducts.v1.update,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.baseProducts.v1.update
+objectClass: device
+
+# 10.patchbaseProducts
+dn: cn=contractmanagement.cms.baseProducts.v1.partialUpdate,ou=Permissions,%ldap.base%
+cn:contractmanagement.cms.baseProducts.v1.partialUpdate
+objectClass: device
+
+# 11. getAllclauseTypesById
+dn: cn=contractmanagement.cms.clauseTypes.v1.read,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.clauseTypes.v1.read
+objectClass: device
+
+# 12 getAllclauseTypes
+dn: cn=contractmanagement.cms.clauseTypes.v1.readAll,ou=Permissions,%ldap.base%
+cn:contractmanagement.cms.clauseTypes.v1.readAll
+objectClass: device
+
+# 13.createclauseTypes
+dn: cn=contractmanagement.cms.clauseTypes.v1.create,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.clauseTypes.v1.create
+objectClass: device
+
+# 14.putclauseTypes
+dn: cn=contractmanagement.cms.clauseTypes.v1.update,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.clauseTypes.v1.update
+objectClass: device
+
+# 15.patchclauseTypes
+dn: cn=contractmanagement.cms.clauseTypes.v1.partialUpdate,ou=Permissions,%ldap.base%
+cn:contractmanagement.cms.clauseTypes.v1.partialUpdate
+objectClass: device
+
+# 16. getAlltemplateLibraryById
+dn: cn=contractmanagement.cms.templateLibrary.v1.read,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.templateLibrary.v1.read
+objectClass: device
+
+# 17 getAlltemplateLibrary
+dn: cn=contractmanagement.cms.templateLibrary.v1.readAll,ou=Permissions,%ldap.base%
+cn:contractmanagement.cms.templateLibrary.v1.readAll
+objectClass: device
+
+# 18.createtemplateLibrary
+dn: cn=contractmanagement.cms.templateLibrary.v1.create,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.templateLibrary.v1.create
+objectClass: device
+
+# 19.puttemplateLibrary
+dn: cn=contractmanagement.cms.templateLibrary.v1.update,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.templateLibrary.v1.update
+objectClass: device
+
+# 20.pattemplateLibrary
+dn: cn=contractmanagement.cms.templateLibrary.v1.partialUpdate,ou=Permissions,%ldap.base%
+cn:contractmanagement.cms.templateLibrary.v1.partialUpdate
+objectClass: device
+
+# 21. getAllrecipientDetailsById
+dn: cn=contractmanagement.cms.recipientDetails.v1.read,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.recipientDetails.v1.read
+objectClass: device
+
+# 22 getAllrecipientDetails
+dn: cn=contractmanagement.cms.recipientDetails.v1.readAll,ou=Permissions,%ldap.base%
+cn:contractmanagement.cms.recipientDetails.v1.readAll
+objectClass: device
+
+# 23.createrecipientDetails
+dn: cn=contractmanagement.cms.recipientDetails.v1.create,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.recipientDetails.v1.create
+objectClass: device
+
+# 24.putrecipientDetails
+dn: cn=contractmanagement.cms.recipientDetails.v1.update,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.recipientDetails.v1.update
+objectClass: device
+
+# 25.patchrecipientDetails
+dn: cn=contractmanagement.cms.recipientDetails.v1.partialUpdate,ou=Permissions,%ldap.base%
+cn:contractmanagement.cms.recipientDetails.v1.partialUpdate
+objectClass: device
+
+
+# 26. getAllrecipientDetailsById
+dn: cn=contractmanagement.cms.recipientDetails.v1.read,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.recipientDetails.v1.read
+objectClass: device
+
+# 27 getAllfileUploads
+dn: cn=contractmanagement.cms.fileUploadss.v1.readAll,ou=Permissions,%ldap.base%
+cn:contractmanagement.cms.fileUploads.v1.readAll
+objectClass: device
+
+# 28.createfileUploads
+dn: cn=contractmanagement.cms.fileUploads.v1.create,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.fileUploads.v1.create
+objectClass: device
+
+# 29.putfileUploads
+dn: cn=contractmanagement.cms.fileUploads.v1.update,ou=Permissions,%ldap.base%
+cn: contractmanagement.cms.fileUploads.v1.update
+objectClass: device
+
+# 30.patchfileUploads
+dn: cn=contractmanagement.cms.fileUploads.v1.partialUpdate,ou=Permissions,%ldap.base%
+cn:contractmanagement.cms.fileUploads.v1.partialUpdate
+objectClass: device
+

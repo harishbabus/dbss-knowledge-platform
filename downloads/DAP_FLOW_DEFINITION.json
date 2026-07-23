@@ -1,0 +1,838 @@
+[{
+  "_id": {
+    "$oid": "68ccef11727e8b55e60ecfb5"
+  },
+  "code": "LUTrigger_FirstRegistration",
+  "module": "Lyca",
+  "version": "v1",
+  "desc": "LUTrigger_FirstRegistration",
+  "logLevel": "RC",
+  "allowedFor": [
+    "api"
+  ],
+  "startNode": {
+    "id": "start_1757504604087",
+    "type": "startNode",
+    "data": {
+      "label": "Start",
+      "hasError": false,
+      "isSelected": false,
+      "__id": "start_1757504604087"
+    },
+    "position": {
+      "x": 322.73289397492886,
+      "y": -116.29335003768918
+    },
+    "firstNode": "insertRecord",
+    "nodeData": {}
+  },
+  "steps": [
+    {
+      "id": "insertRecord",
+      "type": "MongoInsert",
+      "position": {
+        "x": 318.263785748352,
+        "y": -52.24055820848869
+      },
+      "_id": "insertRecord",
+      "nodeId": "5700",
+      "collection": "VE_LU_TRIGGERS",
+      "createJson": {
+        "imsi": "{:requestMap.imsi}",
+        "typeOfOperation": "{:requestMap.typeOfOperation}",
+        "status": "pending",
+        "dummyMsisdn": "{:requestMap.msisdn}",
+        "insertedDate": "{:currentDate}"
+      },
+      "OnSuccess": "ssoToken",
+      "OnFailure": "failedToInsert",
+      "conditionEvaluator": [],
+      "failureConditionEvaluator": [],
+      "label": "insertRecord"
+    },
+    {
+      "id": "fetchRecordFromDRM",
+      "type": "MongoQuery",
+      "position": {
+        "x": 316.62219380983674,
+        "y": 97.34747219669356
+      },
+      "_id": "fetchRecordFromDRM",
+      "nodeId": "5200",
+      "collection": "physicalresources",
+      "Query": {
+        "resourceCharacteristic.value": "{:requestMap.imsi}"
+      },
+      "Projection": {},
+      "limit": 1,
+      "OnSuccess": "checkIfResourceStatusIsAvailable",
+      "OnFailure": "imsiNotPresent",
+      "label": "fetchRecordFromDRM"
+    },
+    {
+      "id": "checkIfResourceStatusIsReserved",
+      "type": "Compare",
+      "position": {
+        "x": 349.79000120097646,
+        "y": 274.17412145859913
+      },
+      "_id": "checkIfResourceStatusIsReserved",
+      "compareOperation": "=",
+      "OnSuccess": "callTaskManagementAPI",
+      "OnFailure": "Failure",
+      "val1": "{:fetchRecordFromDRM[0].resourceStatus}",
+      "val2": "Reserved",
+      "label": "checkIfResourceStatusIsReserved"
+    },
+    {
+      "id": "callTaskManagementAPI",
+      "type": "HTTP",
+      "position": {
+        "x": 252.23554351729513,
+        "y": 372.4277486719515
+      },
+      "_id": "callTaskManagementAPI",
+      "method": "POST",
+      "URL": "https://cxp-dit-pelab4.tecnotree.com/dap-is/DAMtaskClosure",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadType": "JSON",
+      "payload": "{\n  \"type\": \"simSwap\",\n  \"publicIdentifier\": \"{:requestMap.imsi}\",\n  \"taskStatus\": \"Location_Update\"\n}",
+      "OnSuccess": "updateDBForReservedStatus",
+      "OnFailure": "Failure",
+      "label": "callTaskManagementAPI"
+    },
+    {
+      "id": "checkIfResourceStatusIsAvailable",
+      "type": "Compare",
+      "position": {
+        "x": 117.77422289444387,
+        "y": 176.2076163333767
+      },
+      "_id": "checkIfResourceStatusIsAvailable",
+      "compareOperation": "=",
+      "OnSuccess": "frameMinimalPayload",
+      "OnFailure": "checkIfResourceStatusIsReserved",
+      "val1": "{:fetchRecordFromDRM[0].resourceStatus}",
+      "val2": "Available",
+      "label": "checkIfResourceStatusIsAvailable"
+    },
+    {
+      "id": "imsiNotPresent",
+      "type": "Response",
+      "position": {
+        "x": 462.0992593210502,
+        "y": 189.24779104068182
+      },
+      "_id": "imsiNotPresent",
+      "OutputParams": {
+        "status": "not found",
+        "code": 404,
+        "message": "Failed to fetch record from DRM",
+        "reason": "{:fetchRecordFromDRM}"
+      },
+      "label": "imsiNotPresent"
+    },
+    {
+      "id": "callDCLMApi",
+      "type": "HTTP",
+      "position": {
+        "x": -168.00785554647717,
+        "y": 360.18778587799915
+      },
+      "_id": "callDCLMApi",
+      "method": "POST",
+      "URL": "https://fit.pe-lab4.bdc-rancher.tecnotree.com/dap-is/callDCLMWithMinimalPayload",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "{:ssoToken.token}"
+      },
+      "payloadType": "JSON",
+      "payload": "{:frameMinimalPayload}",
+      "OnSuccess": "updateRecordInDB",
+      "OnFailure": "Failure",
+      "label": "callDCLMApi"
+    },
+    {
+      "id": "frameMinimalPayload",
+      "type": "HTTP",
+      "position": {
+        "x": -57.67007159303833,
+        "y": 274.8445187475614
+      },
+      "_id": "frameMinimalPayload",
+      "method": "POST",
+      "URL": "https://fit.pe-lab4.bdc-rancher.tecnotree.com/dap-script/execute?scriptName=minimalPayloadDCLMRegistration.js&functionName=minimalPayloadRegistration",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadType": "JSON",
+      "payload": "{\"payload\": \"{:fetchRecordFromDRM[0]}\"}",
+      "OnSuccess": "callDCLMApi",
+      "OnFailure": "Failure",
+      "label": "frameMinimalPayload"
+    },
+    {
+      "id": "ssoToken",
+      "type": "HTTP",
+      "position": {
+        "x": 326.6908751517563,
+        "y": 16.82562976910056
+      },
+      "_id": "ssoToken",
+      "method": "POST",
+      "URL": "https://cxp-dit-pelab4.tecnotree.com/dap-is/ssoGeneration4",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadType": "JSON",
+      "payload": "{}",
+      "OnSuccess": "fetchRecordFromDRM",
+      "OnFailure": "sso_failure",
+      "label": "ssoToken"
+    },
+    {
+      "id": "sso_failure",
+      "type": "Response",
+      "position": {
+        "x": 562.2858749594346,
+        "y": 105.91596643480756
+      },
+      "_id": "sso_failure",
+      "OutputParams": {
+        "status": "failed",
+        "code": 400,
+        "message": "Failed to get ssoToken",
+        "reason": "{:ssoToken}"
+      },
+      "label": "sso_failure"
+    },
+    {
+      "id": "Success",
+      "type": "Response",
+      "position": {
+        "x": -457.6592823845712,
+        "y": 601.2537818951893
+      },
+      "_id": "Success",
+      "OutputParams": {
+        "status": "success",
+        "code": 200,
+        "message": "updated status in DB",
+        "reason": "updated status in DB"
+      },
+      "label": "Success"
+    },
+    {
+      "id": "Failure",
+      "type": "Response",
+      "position": {
+        "x": -82.83488747617128,
+        "y": 630.7493099914095
+      },
+      "_id": "Failure",
+      "OutputParams": {
+        "status": "failed",
+        "code": 400,
+        "message": "Failed to insert completed status in DB",
+        "reason": "Failed to insert completed status in DB"
+      },
+      "label": "Failure"
+    },
+    {
+      "id": "failedToInsert",
+      "type": "Response",
+      "position": {
+        "x": 568.0152729670182,
+        "y": 23.01650013604541
+      },
+      "_id": "failedToInsert",
+      "OutputParams": {
+        "failure": "{:insertRecord}"
+      },
+      "label": "failedToInsert"
+    },
+    {
+      "id": "updateRecordInDB",
+      "type": "MongoUpdate",
+      "position": {
+        "x": -314.23282251467606,
+        "y": 461.33502022247603
+      },
+      "_id": "updateRecordInDB",
+      "nodeId": "5700",
+      "collection": "VE_LU_TRIGGERS",
+      "match": "{\"imsi\":\"{:requestMap.requestMap.imsi}\",\"typeOfOperation\":\"{:requestMap.requestMap.typeOfOperation}\"}",
+      "set": "{\"status\":\"completed\"}",
+      "OnSuccess": "Success",
+      "OnFailure": "Failure",
+      "conditionEvaluator": [],
+      "failureConditionEvaluator": [],
+      "label": "updateRecordInDB"
+    },
+    {
+      "id": "updateDBForReservedStatus",
+      "type": "MongoUpdate",
+      "position": {
+        "x": 339.67209740331367,
+        "y": 524.5004119566968
+      },
+      "_id": "updateDBForReservedStatus",
+      "nodeId": "5700",
+      "collection": "VE_LU_TRIGGERS",
+      "match": "{\"imsi\":\"{:requestMap.requestMap.imsi}\",\"typeOfOperation\":\"{:requestMap.requestMap.typeOfOperation}\"}",
+      "set": "{\"status\":\"completed\"}",
+      "OnSuccess": "Success",
+      "OnFailure": "Failure",
+      "conditionEvaluator": [],
+      "failureConditionEvaluator": [],
+      "label": "updateDBForReservedStatus"
+    }
+  ],
+  "LAST_MODIFIED_BY": "",
+  "LAST_MODIFIED_ON": {
+    "$date": "2025-11-15T07:20:36.963Z"
+  },
+  "timeout": "10000"
+},
+{
+  "_id": {
+    "$oid": "68da5aae42fa91b3acc04ac4"
+  },
+  "code": "bundleUsageDetails",
+  "module": "Lyca",
+  "version": "v1",
+  "desc": "To get bundle usage details",
+  "timeout": "10000",
+  "logLevel": "RC",
+  "allowedFor": [
+    "api"
+  ],
+  "startNode": {
+    "id": "start_1759140466916",
+    "type": "startNode",
+    "data": {
+      "label": "Start",
+      "hasError": false,
+      "isSelected": false,
+      "__id": "start_1759140466916"
+    },
+    "position": {
+      "x": 505,
+      "y": 56
+    },
+    "firstNode": "getProductInventoryDetails",
+    "nodeData": {}
+  },
+  "steps": [
+    {
+      "id": "getProductInventoryDetails",
+      "type": "HTTP",
+      "position": {
+        "x": 513,
+        "y": 159
+      },
+      "_id": "getProductInventoryDetails",
+      "method": "POST",
+      "URL": "{:requestMap.config.dapIntegrationServiceUrl}/dap-is/getProductInventoryDetails",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "{:headerMap.authorization}"
+      },
+      "payloadType": "JSON",
+      "payload": "{:requestMap.requestMap}",
+      "timeout": "5000",
+      "OnSuccess": "getBalanceFromDOCS",
+      "OnFailure": "failureFromProductInventory",
+      "conditionEvaluator": [],
+      "failureConditionEvaluator": [],
+      "label": "getProductInventoryDetails"
+    },
+    {
+      "id": "getBalanceFromDOCS",
+      "type": "HTTP",
+      "position": {
+        "x": 307.81991079269136,
+        "y": 255.25173724117468
+      },
+      "_id": "getBalanceFromDOCS",
+      "method": "POST",
+      "URL": "{:requestMap.config.dapIntegrationServiceUrl}/dap-is/getBalanceFromDOCS",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "{:headerMap.authorization}"
+      },
+      "payloadType": "JSON",
+      "payload": "{:requestMap.requestMap}",
+      "timeout": "5000",
+      "OnSuccess": "getPublicIdentifierScript",
+      "OnFailure": "failureFromDOCS",
+      "conditionEvaluator": [],
+      "failureConditionEvaluator": [],
+      "label": "getBalanceFromDOCS"
+    },
+    {
+      "id": "failureFromProductInventory",
+      "type": "Response",
+      "position": {
+        "x": 671.3193987136706,
+        "y": 262.4358130098534
+      },
+      "_id": "failureFromProductInventory",
+      "OutputParams": {
+        "status": "failed",
+        "code": 400,
+        "message": "Failed while fetching Product Inventory details",
+        "reason": "{:getProductInventoryDetails}"
+      },
+      "label": "failureFromProductInventory"
+    },
+    {
+      "id": "getPublicIdentifierScript",
+      "type": "HTTP",
+      "position": {
+        "x": 198.71443202257728,
+        "y": 347.5383293766388
+      },
+      "_id": "getPublicIdentifierScript",
+      "method": "POST",
+      "URL": "{:requestMap.config.dapScriptServiceUrl}/dap-script/execute?scriptName=getBundleUsage.js&functionName=getUsageBalanceDetailsScript",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadType": "JSON",
+      "payload": "{\"requestMap\":\"{:requestMap.requestMap}\",\n\"getProductInventoryDetails\":\"{:getProductInventoryDetails}\",\n\"getBalanceFromDOCS\":\"{:getBalanceFromDOCS}\"\n}",
+      "timeout": "5000",
+      "OnSuccess": "success",
+      "OnFailure": "failureFromScript",
+      "conditionEvaluator": [],
+      "failureConditionEvaluator": [],
+      "label": "getPublicIdentifierScript"
+    },
+    {
+      "id": "success",
+      "type": "Response",
+      "position": {
+        "x": 73,
+        "y": 443
+      },
+      "_id": "success",
+      "OutputParams": "{:getPublicIdentifierScript}",
+      "label": "success"
+    },
+    {
+      "id": "failureFromDOCS",
+      "type": "Response",
+      "position": {
+        "x": 517,
+        "y": 360
+      },
+      "_id": "failureFromDOCS",
+      "OutputParams": {
+        "status": "failed",
+        "code": 400,
+        "message": "Failed to get balance from docs",
+        "reason": "{:getBalanceFromDOCS}"
+      },
+      "label": "failureFromDOCS"
+    },
+    {
+      "id": "failureFromScript",
+      "type": "Response",
+      "position": {
+        "x": 377,
+        "y": 441
+      },
+      "_id": "failureFromScript",
+      "OutputParams": {
+        "status": "failed",
+        "code": 400,
+        "message": "Failed to get public identifier in script",
+        "reason": "{:getPublicIdentifierScript}"
+      },
+      "label": "failureFromScript"
+    }
+  ],
+  "CREATED_BY": "",
+  "LAST_MODIFIED_BY": "",
+  "CREATED_ON": {
+    "$date": "2025-09-29T10:08:46.551Z"
+  },
+  "LAST_MODIFIED_ON": {
+    "$date": "2025-10-25T08:38:05.158Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69117c3e39833fc660b472d0"
+  },
+  "code": "portinRspMsisdnTaskClosure",
+  "module": "Lyca",
+  "version": "v1",
+  "desc": "Flow design to close DAM tasks with MSISDN from RSP file",
+  "timeout": "10000",
+  "logLevel": "RC",
+  "allowedFor": [
+    "api"
+  ],
+  "startNode": {
+    "id": "start_1762753340099",
+    "type": "startNode",
+    "data": {
+      "label": "Start",
+      "hasError": false,
+      "isSelected": false,
+      "__id": "start_1762753340099"
+    },
+    "position": {
+      "x": 500,
+      "y": 20,
+      "calc": true
+    },
+    "firstNode": "closeTaskInDAM",
+    "nodeData": {}
+  },
+  "steps": [
+    {
+      "id": "closeTaskInDAM",
+      "type": "HTTP",
+      "position": {
+        "x": 499.743092292862,
+        "y": 115.13731412046172
+      },
+      "_id": "closeTaskInDAM",
+      "method": "POST",
+      "URL": "{:requestMap.config.dapIntegrationServiceUrl}/dap-is/DAMtaskClosure",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "{:headerMap.authorization}"
+      },
+      "payloadType": "JSON",
+      "payload": "{\n  \"type\": \"{:requestMap.requestMap.type}\",\n  \"publicIdentifier\": \"{:requestMap.requestMap.msisdn}\",\n  \"taskStatus\": \"{:requestMap.requestMap.taskStatus}\"\n}",
+      "timeout": "5000",
+      "OnSuccess": "updateMsisdnStatus",
+      "OnFailure": "closeTaskInDAM_failure",
+      "conditionEvaluator": [],
+      "failureConditionEvaluator": [],
+      "label": "closeTaskInDAM"
+    },
+    {
+      "id": "updateMsisdnStatus",
+      "type": "MongoUpdate",
+      "position": {
+        "x": 395.78844365519956,
+        "y": 241.32081962556032
+      },
+      "_id": "updateMsisdnStatus",
+      "nodeId": "5700",
+      "collection": "VE_PORTIN_MSISDN",
+      "match": "{\"msisdn\": \"{:requestMap.requestMap.msisdn}\", \"status\": \"pending\"}",
+      "set": "{\"status\": \"completed\"}",
+      "OnSuccess": "closeTaskInDAM_Success",
+      "OnFailure": "updateMsisdnStatus_failure",
+      "conditionEvaluator": [],
+      "failureConditionEvaluator": [],
+      "label": "updateMsisdnStatus"
+    },
+    {
+      "id": "closeTaskInDAM_Success",
+      "type": "Response",
+      "position": {
+        "x": 245.11875356437707,
+        "y": 341.88040641332367
+      },
+      "_id": "closeTaskInDAM_Success",
+      "OutputParams": {
+        "status": "success",
+        "code": 200,
+        "message": "DAM task closed successfully",
+        "reason": "{:requestMap.requestMap.msisdn}"
+      },
+      "label": "closeTaskInDAM_Success"
+    },
+    {
+      "id": "closeTaskInDAM_failure",
+      "type": "Response",
+      "position": {
+        "x": 710.9814394439153,
+        "y": 248.83463503983643
+      },
+      "_id": "closeTaskInDAM_failure",
+      "OutputParams": {
+        "status": "{:closeTaskInDAMStatus.status}",
+        "code": "{:closeTaskInDAMStatus.statusCode}",
+        "message": "Error while closing the DAM task",
+        "reason": "{:closeTaskInDAM}"
+      },
+      "label": "closeTaskInDAM_failure"
+    },
+    {
+      "id": "updateMsisdnStatus_failure",
+      "type": "Response",
+      "position": {
+        "x": 510.41236237253486,
+        "y": 340.76123283779697
+      },
+      "_id": "updateMsisdnStatus_failure",
+      "OutputParams": {
+        "status": "{:updateMsisdnStatusStatus.status}",
+        "code": "{:updateMsisdnStatusStatus.statusCode}",
+        "message": "Error while updating MSISDN status in DB",
+        "reason": "{:updateMsisdnStatus}"
+      },
+      "label": "updateMsisdnStatus_failure"
+    }
+  ],
+  "CREATED_BY": "",
+  "LAST_MODIFIED_BY": "",
+  "CREATED_ON": {
+    "$date": "2025-11-10T05:46:38.042Z"
+  },
+  "LAST_MODIFIED_ON": {
+    "$date": "2025-11-10T19:44:53.155Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6912e89a39833fc660b47368"
+  },
+  "code": "rechargeVoucher",
+  "module": "Lyca",
+  "version": "v1",
+  "desc": "To do recharge voucher",
+  "timeout": "10000",
+  "logLevel": "NO",
+  "allowedFor": [
+    "api"
+  ],
+  "startNode": {
+    "id": "start_1762846427862",
+    "type": "startNode",
+    "data": {
+      "label": "Start",
+      "hasError": false,
+      "isSelected": false,
+      "__id": "start_1762846427862"
+    },
+    "position": {
+      "x": 503,
+      "y": 23.799999999999997
+    },
+    "firstNode": "reserveVoucher",
+    "nodeData": {}
+  },
+  "steps": [
+    {
+      "id": "reserveVoucher",
+      "type": "HTTP",
+      "position": {
+        "x": 503,
+        "y": 111
+      },
+      "_id": "reserveVoucher",
+      "method": "POST",
+      "URL": "{:requestMap.config.dapIntegrationServiceUrl}/dap-is/vomsVoucherRecharge",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "{:headerMap.authorization}"
+      },
+      "payloadType": "JSON",
+      "payload": "{:requestMap.requestMap}",
+      "timeout": "5000",
+      "OnSuccess": "checkForBundleOrDenomination",
+      "OnFailure": "failure",
+      "conditionEvaluator": [],
+      "failureConditionEvaluator": [],
+      "label": "reserveVoucher"
+    },
+    {
+      "id": "callDCLMAddVas",
+      "type": "HTTP",
+      "position": {
+        "x": 260.7578237938819,
+        "y": 452.0807254020393
+      },
+      "_id": "callDCLMAddVas",
+      "method": "POST",
+      "URL": "{:requestMap.config.dapIntegrationServiceUrl}/dap-is/addVasProductRequest",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "{:headerMap.authorization}"
+      },
+      "payloadType": "JSON",
+      "payload": "{:framePayloadForDCLMAddVas}",
+      "timeout": "5000",
+      "OnSuccess": "successFromDCLM",
+      "OnFailure": "failure",
+      "conditionEvaluator": [],
+      "failureConditionEvaluator": [],
+      "label": "callDCLMAddVas"
+    },
+    {
+      "id": "callDOCSRecharge",
+      "type": "HTTP",
+      "position": {
+        "x": 676,
+        "y": 362.3229016081574
+      },
+      "_id": "callDOCSRecharge",
+      "method": "POST",
+      "URL": "{:requestMap.config.dapIntegrationServiceUrl}/dap-is/docsRecharge",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "{:headerMap.authorization}"
+      },
+      "payloadType": "JSON",
+      "payload": "{:framePayloadForDOCSRecharge}",
+      "timeout": "5000",
+      "OnSuccess": "successFromDOCS",
+      "OnFailure": "failure",
+      "conditionEvaluator": [],
+      "failureConditionEvaluator": [],
+      "label": "callDOCSRecharge"
+    },
+    {
+      "id": "checkForBundleOrDenomination",
+      "type": "Compare",
+      "position": {
+        "x": 479,
+        "y": 190
+      },
+      "_id": "checkForBundleOrDenomination",
+      "compareOperation": "=",
+      "OnSuccess": "framePayloadForDOCSRecharge",
+      "OnFailure": "getProductInventoryDetails",
+      "conditionEvaluator": [],
+      "failureConditionEvaluator": [],
+      "val1": "{:reserveVoucher.bundleCode}",
+      "val2": "0",
+      "label": "checkForBundleOrDenomination"
+    },
+    {
+      "id": "failure",
+      "type": "Response",
+      "position": {
+        "x": 907,
+        "y": 549
+      },
+      "_id": "failure",
+      "OutputParams": {
+        "status": "failed",
+        "code": 400,
+        "message": "Failed to fetch recharge details",
+        "reason": "Failed to fetch recharge details"
+      },
+      "label": "failure"
+    },
+    {
+      "id": "successFromDOCS",
+      "type": "Response",
+      "position": {
+        "x": 576,
+        "y": 557
+      },
+      "_id": "successFromDOCS",
+      "OutputParams": {
+        "status": "success",
+        "code": 200,
+        "message": "{:callDOCSRecharge}",
+        "reason": "{:callDOCSRecharge}"
+      },
+      "label": "successFromDOCS"
+    },
+    {
+      "id": "successFromDCLM",
+      "type": "Response",
+      "position": {
+        "x": 129.73633515060897,
+        "y": 549.3185237918726
+      },
+      "_id": "successFromDCLM",
+      "OutputParams": {
+        "status": "success",
+        "code": 200,
+        "message": "{:callDCLMAddVas}",
+        "reason": "{:callDCLMAddVas}"
+      },
+      "label": "successFromDCLM"
+    },
+    {
+      "id": "getProductInventoryDetails",
+      "type": "HTTP",
+      "position": {
+        "x": 266,
+        "y": 282
+      },
+      "_id": "getProductInventoryDetails",
+      "method": "GET",
+      "URL": "{:requestMap.config.dapIntegrationServiceUrl}/dap-is/getProductInventoryDetails?publicIdentifier={:reserveVoucher.usedBy}",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "{:headerMap.authorization}"
+      },
+      "payloadType": "JSON",
+      "payload": "{}",
+      "timeout": "5000",
+      "OnSuccess": "framePayloadForDCLMAddVas",
+      "OnFailure": "failure",
+      "conditionEvaluator": [],
+      "failureConditionEvaluator": [],
+      "label": "getProductInventoryDetails"
+    },
+    {
+      "id": "framePayloadForDCLMAddVas",
+      "type": "HTTP",
+      "position": {
+        "x": 256,
+        "y": 372
+      },
+      "_id": "framePayloadForDCLMAddVas",
+      "method": "POST",
+      "URL": "{:requestMap.config.dapScriptServiceUrl}/dap-script/execute?scriptName=recharge.js&functionName=frameDCLMPayloadForRecharge",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "{:headerMap.authorization}"
+      },
+      "payloadType": "JSON",
+      "payload": "{\n  \"rechargeRequest\": \"{:requestMap}\",\n  \"voucherResponse\": \"{:reserveVoucher}\",\n  \"PIResponse\": \"{:getProductInventoryDetails[0]}\"\n}",
+      "timeout": "5000",
+      "OnSuccess": "callDCLMAddVas",
+      "OnFailure": "failure",
+      "conditionEvaluator": [],
+      "failureConditionEvaluator": [],
+      "label": "framePayloadForDCLMAddVas"
+    },
+    {
+      "id": "framePayloadForDOCSRecharge",
+      "type": "HTTP",
+      "position": {
+        "x": 622,
+        "y": 286
+      },
+      "_id": "framePayloadForDOCSRecharge",
+      "method": "POST",
+      "URL": "{:requestMap.config.dapScriptServiceUrl}/dap-script/execute?scriptName=recharge.js&functionName=frameDOCSPayloadForRecharge",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "{:headerMap.authorization}"
+      },
+      "payloadType": "JSON",
+      "payload": "{\n  \"voucherResponse\": \"{:reserveVoucher}\"\n}",
+      "timeout": "5000",
+      "OnSuccess": "callDOCSRecharge",
+      "OnFailure": "failure",
+      "conditionEvaluator": [],
+      "failureConditionEvaluator": [],
+      "label": "framePayloadForDOCSRecharge"
+    }
+  ],
+  "CREATED_BY": "",
+  "LAST_MODIFIED_BY": "",
+  "CREATED_ON": {
+    "$date": "2025-11-11T07:41:14.716Z"
+  },
+  "LAST_MODIFIED_ON": {
+    "$date": "2025-11-14T15:19:58.685Z"
+  }
+}]

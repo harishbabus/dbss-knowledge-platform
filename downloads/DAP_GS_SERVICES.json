@@ -1,0 +1,1413 @@
+[{
+  "_id": {
+    "$oid": "68cbcdef3c246bdab0c53541"
+  },
+  "Service": {
+    "serviceId": 9085,
+    "serviceName": "viewBalanceDetails",
+    "serviceDesc": "View Balance Details DOCS API",
+    "groupName": "Lyca",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": true,
+    "ssoValidation": false,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "2118",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "Both",
+        "inputValidation": {
+          "fileName": "viewBalanceDetails.js",
+          "functionName": "requestPayloadTransformation",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "viewBalanceDetails.js",
+          "functionName": "responseTransformation"
+        }
+      },
+      "REST": {
+        "method": "GET",
+        "restServiceUrl": "/docs-api-service/v1/MVNO/0/Subscriber/{:requestMap.publicIdentifier}/Balance?entityType=C&spendGroupDetailsFlag=1&referenceNumber={:requestMap.referenceNumber}&eventSource=DCLM&relationShipType=0",
+        "headers": {
+          "authorization": []
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-09-18T09:13:07.073Z",
+    "modifiedOn": "2025-11-15T12:36:39.519Z",
+    "modifiedBy": "dclmdapuser",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-11-15T12:36:13.281Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68d61bb842fa91b3acc049af"
+  },
+  "Service": {
+    "serviceId": 257,
+    "serviceName": "viewDABalanceDetails",
+    "serviceDesc": "view DA Balance Details API",
+    "groupName": "Lyca",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": true,
+    "ssoValidation": false,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "2118",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "Both",
+        "inputValidation": {
+          "fileName": "viewDABalance.js",
+          "functionName": "requestPayloadTransformation",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "viewDABalance.js",
+          "functionName": "responseTransformation"
+        }
+      },
+      "REST": {
+        "method": "GET",
+        "restServiceUrl": "/docs-api-service/financeManagement/v1/MVNO/0/Subscriber/{:requestMap.publicIdentifier}/Balance?entityType=C&spendGroupDetailsFlag=0&referenceNumber={:requestMap.referenceNumber}&eventSource=DCLM&relationShipType=0",
+        "headers": {
+          "authorization": []
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-09-26T04:44:15.207Z",
+    "modifiedOn": "2025-11-19T14:33:36.024Z",
+    "modifiedBy": "professor",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-11-19T14:33:02.989Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68d6418642fa91b3acc049de"
+  },
+  "Service": {
+    "serviceId": 8905,
+    "serviceName": "getTokenForStoredPaymentDetails",
+    "serviceDesc": "To get token for stored payment details from adyen API",
+    "groupName": "Adyen",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": false,
+    "ssoValidation": false,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "6820",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "",
+        "inputValidation": {
+          "fileName": "",
+          "functionName": "",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "",
+          "functionName": ""
+        }
+      },
+      "REST": {
+        "method": "GET",
+        "restServiceUrl": "/dev/uk/adyen/v1/storedPaymentMethods?shopperReference={:requestMap.shopperReference}&merchantAccount={:config.adyenMerchantAccount}",
+        "headers": {
+          "x-api-key": [
+            "{:config.adyenApiKey}"
+          ]
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-09-26T07:30:10.517Z",
+    "modifiedOn": "2025-11-20T12:26:14.059Z",
+    "modifiedBy": "professor",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-11-20T12:25:47.979Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68d6586a42fa91b3acc04a03"
+  },
+  "Service": {
+    "serviceId": 768,
+    "serviceName": "getAvailablePaymentMethods",
+    "serviceDesc": "To get the available payment methods API from adyen",
+    "groupName": "Adyen",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": false,
+    "ssoValidation": false,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "6820",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "",
+        "inputValidation": {
+          "fileName": "",
+          "functionName": "",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "",
+          "functionName": ""
+        }
+      },
+      "REST": {
+        "method": "POST",
+        "restServiceUrl": "/dev/uk/adyen/v1/paymentMethods",
+        "restRequestPayload": {
+          "merchantAccount": "{:config.adyenMerchantAccount}"
+        },
+        "headers": {
+          "x-api-key": [
+            "{:config.adyenApiKey}"
+          ]
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-09-26T09:05:11.669Z",
+    "modifiedOn": "2025-11-20T12:24:40.987Z",
+    "modifiedBy": "professor",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-11-20T12:24:33.263Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68d6889442fa91b3acc04a4a"
+  },
+  "Service": {
+    "serviceId": 6703,
+    "serviceName": "generatePaymentLinkFromAdyen",
+    "serviceDesc": "Adyen API to generate payment link",
+    "groupName": "Adyen",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": false,
+    "ssoValidation": false,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "6820",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "",
+        "inputValidation": {
+          "fileName": "",
+          "functionName": "",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "",
+          "functionName": ""
+        }
+      },
+      "REST": {
+        "method": "POST",
+        "restServiceUrl": "/dev/uk/adyen/v1/paymentLinks",
+        "restRequestPayload": "{:requestMap}",
+        "headers": {
+          "x-api-key": [
+            "{:config.adyenApiKey}"
+          ]
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-09-26T12:33:04.949Z",
+    "modifiedOn": "2025-11-20T12:43:24.166Z",
+    "modifiedBy": "dclmdapuser",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-11-20T12:48:17.414Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68da1eac42fa91b3acc04ab8"
+  },
+  "Service": {
+    "serviceId": 3020,
+    "serviceName": "bundleUsageDetails",
+    "serviceDesc": "To get the final response of bundle usage details",
+    "groupName": "Lyca",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": true,
+    "ssoValidation": true,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "6887",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "Output",
+        "inputValidation": {
+          "fileName": "",
+          "functionName": "",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "getBundleUsage.js",
+          "functionName": "frameFinalResponse"
+        }
+      },
+      "REST": {
+        "method": "POST",
+        "restServiceUrl": "/trigger/api/Lyca/v1/bundleUsageDetails",
+        "restRequestPayload": {
+          "requestMap": "{:requestMap}",
+          "config": "{:config}",
+          "log": false
+        },
+        "headers": {
+          "authorization": [],
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-10-03T10:42:39.347Z",
+    "modifiedOn": "2025-10-29T15:38:53.008Z",
+    "modifiedBy": "professor",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-10-29T15:38:14.748Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68da5d2c42fa91b3acc04acb"
+  },
+  "Service": {
+    "serviceId": 822,
+    "serviceName": "getBalanceFromDOCS",
+    "serviceDesc": "To get balance from DOCS",
+    "groupName": "Lyca",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": true,
+    "ssoValidation": false,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "2118",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "Input",
+        "inputValidation": {
+          "fileName": "getBundleUsage.js",
+          "functionName": "requestPayload",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "",
+          "functionName": ""
+        }
+      },
+      "REST": {
+        "method": "GET",
+        "restServiceUrl": "/docs-api-service/financeManagement/v1/MVNO/0/Subscriber/{:requestMap.publicIdentifier}/Balance?entityType=C&spendGroupDetailsFlag=0&referenceNumber={:requestMap.referenceNumber}&eventSource=DCLM&relationShipType=0",
+        "headers": {
+          "authorization": []
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-09-29T10:14:08.114Z",
+    "modifiedOn": "2025-11-19T14:23:08.261Z",
+    "modifiedBy": "professor",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-11-19T14:23:19.707Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68e3614342fa91b3acc04c3c"
+  },
+  "Service": {
+    "serviceId": 4814,
+    "serviceName": "updateMaDaBalance",
+    "serviceDesc": "Service to update MA and DA Balance",
+    "groupName": "Lyca",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": true,
+    "ssoValidation": true,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "9174",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "Input",
+        "inputValidation": {
+          "fileName": "docsChangeBalanceUseCases.js",
+          "functionName": "frameRequestForMaDaUpdate",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "",
+          "functionName": ""
+        }
+      },
+      "REST": {
+        "method": "PATCH",
+        "restServiceUrl": "/DAP/workflow/docsPatchRequest",
+        "restRequestPayload": "{:requestMap}",
+        "headers": {
+          "content-type": [
+            "application/json"
+          ],
+          "authorization": []
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-10-06T06:25:58.883Z",
+    "modifiedOn": "2025-10-16T05:01:04.716Z",
+    "modifiedBy": "dclmdapuser",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-10-16T05:00:40.127Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68e4f94842fa91b3acc04ca9"
+  },
+  "Service": {
+    "serviceId": 4834,
+    "serviceName": "creditDebitAdjustment",
+    "serviceDesc": "Integration Service to manage credit and debit adjustment",
+    "groupName": "Lyca",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": true,
+    "ssoValidation": true,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "6887",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "Output",
+        "inputValidation": {
+          "fileName": "",
+          "functionName": "",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "docsChangeBalanceUseCases.js",
+          "functionName": "frameFinalResponse"
+        }
+      },
+      "REST": {
+        "method": "POST",
+        "restServiceUrl": "/trigger/api/Lyca/v1/creditDebitAdjustment",
+        "restRequestPayload": {
+          "requestMap": "{:requestMap}",
+          "config": "{:config}",
+          "log": false
+        },
+        "headers": {
+          "authorization": [],
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-10-07T11:26:50.522Z",
+    "modifiedOn": "2025-10-15T04:39:31.038Z",
+    "modifiedBy": "dclmdapuser",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Successfully Verified"
+  },
+  "lastRefreshed": {
+    "$date": "2025-10-15T04:38:59.389Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68e4fce342fa91b3acc04cb9"
+  },
+  "Service": {
+    "serviceId": 2218,
+    "serviceName": "voucherDetails",
+    "serviceDesc": "To get voucher details from VOMS",
+    "groupName": "VOMS",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": true,
+    "ssoValidation": false,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "3088",
+      "timeout": 10000,
+      "scriptAction": {
+        "action": "Output",
+        "inputValidation": {
+          "fileName": "",
+          "functionName": "",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "commonScript.js",
+          "functionName": "frameFinalResponseForVoucherDetails"
+        }
+      },
+      "REST": {
+        "method": "GET",
+        "restServiceUrl": "/voms/v1/voucher/details?serialNumber={:requestMap.voucherNumber}",
+        "headers": {
+          "authorization": [],
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-10-07T11:41:24.019Z",
+    "modifiedOn": "2025-11-17T10:41:48.598Z",
+    "modifiedBy": "professor",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-11-17T10:41:15.567Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68e7515e42fa91b3acc04e29"
+  },
+  "Service": {
+    "serviceId": 7113,
+    "serviceName": "billPayment",
+    "serviceDesc": "billPayment",
+    "groupName": "Lyca",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": true,
+    "ssoValidation": true,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "6887",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "Output",
+        "inputValidation": {
+          "fileName": "",
+          "functionName": "",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "docsChangeBalanceUseCases.js",
+          "functionName": "frameFinalResponse"
+        }
+      },
+      "REST": {
+        "method": "POST",
+        "restServiceUrl": "/trigger/api/Lyca/v1/billPayment",
+        "restRequestPayload": {
+          "requestMap": "{:requestMap}",
+          "config": "{:config}",
+          "log": false
+        },
+        "headers": {
+          "authorization": [],
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-10-09T06:07:33.472Z",
+    "modifiedOn": "2025-10-15T04:39:46.656Z",
+    "modifiedBy": "dclmdapuser",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-10-15T04:39:14.961Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68efa39f1ad7dc087ca9190f"
+  },
+  "Service": {
+    "serviceId": 3489,
+    "serviceName": "checkIfPaymentDetailsExists",
+    "serviceDesc": "Integration Service to check if customer has saved payment details",
+    "groupName": "Adyen",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": true,
+    "ssoValidation": true,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "6820",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "Output",
+        "inputValidation": {
+          "fileName": "",
+          "functionName": "",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "adyenPaymentsScripts.js",
+          "functionName": "checkIfPaymentDetailsExists"
+        }
+      },
+      "REST": {
+        "method": "GET",
+        "restServiceUrl": "/dev/uk/adyen/v1/storedPaymentMethods?shopperReference={:requestMap.customerId}&merchantAccount={:config.adyenMerchantAccount}",
+        "headers": {
+          "x-api-key": [
+            "{:config.adyenApiKey}"
+          ]
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-10-15T13:36:20.884Z",
+    "modifiedOn": "2025-11-20T12:54:44.524Z",
+    "modifiedBy": "professor",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-11-20T12:54:37.182Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68fa48bc1ad7dc087ca91a73"
+  },
+  "Service": {
+    "serviceId": 8658,
+    "serviceName": "makePaymentWithStoredToken",
+    "serviceDesc": "adyen auto pay with stored token",
+    "groupName": "Lyca",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": false,
+    "ssoValidation": false,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "6820",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "",
+        "inputValidation": {
+          "fileName": "",
+          "functionName": "",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "",
+          "functionName": ""
+        }
+      },
+      "REST": {
+        "method": "POST",
+        "restServiceUrl": "/dev/uk/adyen/v1/payments",
+        "restRequestPayload": {
+          "amount": {
+            "currency": "{:requestMap.currency}",
+            "value": "{:requestMap.value}"
+          },
+          "reference": "{:requestMap.reference}",
+          "paymentMethod": {
+            "type": "scheme",
+            "storedPaymentMethodId": "{:requestMap.storedPaymentMethodId}"
+          },
+          "shopperReference": "{:requestMap.shopperReference}",
+          "recurringProcessingModel": "Subscription",
+          "shopperInteraction": "ContAuth",
+          "storePaymentMethod": false,
+          "merchantAccount": "{:config.adyenMerchantAccount}"
+        },
+        "headers": {
+          "authorization": [
+            "{:config.adyenApiKey}"
+          ],
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-10-23T15:18:36.901Z",
+    "modifiedOn": "2025-11-20T12:27:03.118Z",
+    "modifiedBy": "professor",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-11-20T12:26:24.365Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68fe7c001ad7dc087ca91ba0"
+  },
+  "Service": {
+    "serviceId": 6856,
+    "serviceName": "fetchCreditScore",
+    "serviceDesc": "Experian api to fetch credit score",
+    "groupName": "Lyca",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": false,
+    "ssoValidation": false,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": false,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "7017",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "",
+        "inputValidation": {
+          "fileName": "",
+          "functionName": "",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "",
+          "functionName": ""
+        }
+      },
+      "REST": {
+        "method": "POST",
+        "restServiceUrl": "/dev/uk/experian/v1/consumerdata/application",
+        "restRequestPayload": "{:requestMap}",
+        "headers": {
+          "content-type": [
+            "application/json"
+          ],
+          "accept": [
+            "application/json"
+          ],
+          "apikey": [
+            "{:config.experianApiKey}"
+          ]
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-10-26T19:46:12.022Z",
+    "modifiedOn": "2025-11-19T14:26:29.350Z",
+    "modifiedBy": "professor",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-11-19T14:26:52.997Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69004b731ad7dc087ca91c7b"
+  },
+  "Service": {
+    "serviceId": 6524,
+    "serviceName": "adyenCallback",
+    "serviceDesc": "To call adyen callback flow controller to channelize",
+    "groupName": "Adyen",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": true,
+    "ssoValidation": false,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "6887",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "Output",
+        "inputValidation": {
+          "fileName": "",
+          "functionName": "",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "commonScript.js",
+          "functionName": "frameFinalResponse"
+        }
+      },
+      "REST": {
+        "method": "POST",
+        "restServiceUrl": "/trigger/api/Lyca/v1/adyenCallbackWithHmac",
+        "restRequestPayload": {
+          "requestMap": "{:requestMap}",
+          "config": "{:config}",
+          "log": false
+        },
+        "headers": {
+          "content-type": [
+            "application/json"
+          ],
+          "authorization": [],
+          "php-auth-user": [],
+          "php-auth-pw": []
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-10-28T04:44:00.117Z",
+    "modifiedOn": "2025-11-18T10:44:57.912Z",
+    "modifiedBy": "professor",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-11-18T10:44:22.365Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69045edecfad682b52246ff4"
+  },
+  "Service": {
+    "serviceId": 8584,
+    "serviceName": "pacValidation",
+    "serviceDesc": "pacValidation",
+    "groupName": "Lyca",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": true,
+    "ssoValidation": false,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": false,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "7915",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "Both",
+        "inputValidation": {
+          "fileName": "fetchDeatilsDB.js",
+          "functionName": "generateSessionID",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "getResponse.js",
+          "functionName": "getResponse"
+        }
+      },
+      "REST": {},
+      "SOAP": {
+        "serviceUrl": "/mnpRetrieveEntry",
+        "requestPayload": {
+          "Payload": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<mnp_request>\n    <cookie>sesessionid={:sessionId}</cookie>\n    <retrieve_entry>\n        <req_code>{:requestMap.req_code}</req_code>\n        <loose_entry_key>\n            <entry_validator>\n                <ref>{:finalTransactionId}</ref>\n            </entry_validator>\n            <msisdn>{:requestMap.msisdn}</msisdn>\n            <pac>{:requestMap.pac}</pac>\n        </loose_entry_key>\n    </retrieve_entry>\n</mnp_request>\n",
+          "JSONXMLTagBody": {
+            "key": "value"
+          },
+          "JSONXMLTagHeader": {
+            "key": "value"
+          }
+        },
+        "headers": {
+          "apikey": [
+            "{:config.Apikey}"
+          ]
+        },
+        "tag-mapping": {},
+        "ResultTag": null,
+        "StringifyFields": false
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-10-31T06:52:42.677Z",
+    "modifiedOn": "2025-11-19T06:03:23.399Z",
+    "modifiedBy": "professor",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-11-19T06:02:39.173Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "690c71c639833fc660b471c7"
+  },
+  "Service": {
+    "serviceId": 5572,
+    "serviceName": "deleteStoredPaymentToken",
+    "serviceDesc": "To delete the saved card",
+    "groupName": "NB",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": true,
+    "ssoValidation": false,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "6820",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "Output",
+        "inputValidation": {
+          "fileName": "",
+          "functionName": "",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "commonScript.js",
+          "functionName": "responseTransformationFotDeleteToken"
+        }
+      },
+      "REST": {
+        "method": "DELETE",
+        "restServiceUrl": "/dev/uk/adyen/v1/storedPaymentMethods/{:requestMap.storedPaymentMethodId}?shopperReference={:requestMap.shopperReference}&merchantAccount={:config.adyenMerchantAccount}",
+        "headers": {
+          "x-api-key": [
+            "{:config.adyenApiKey}"
+          ]
+        },
+        "responseHeaders": {},
+        "restRequestParams": ""
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-11-06T09:54:06.066Z",
+    "modifiedOn": "2025-11-20T12:25:34.893Z",
+    "modifiedBy": "professor",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-11-20T12:25:12.653Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69130e6739833fc660b47385"
+  },
+  "Service": {
+    "serviceId": 4215,
+    "serviceName": "getProductBalance",
+    "serviceDesc": "To get the product balance from DOCS",
+    "groupName": "NB",
+    "inputValidation": false,
+    "outputMapping": false,
+    "scriptOperation": true,
+    "ssoValidation": false,
+    "jwtValidation": false,
+    "api_access": false,
+    "payloadRequiredInLog": true,
+    "dbLogging": true,
+    "soapTransformation": false,
+    "Input": {
+      "type": "object",
+      "allowAdditionalProperties": false,
+      "properties": {}
+    },
+    "showInputValPopup": false,
+    "isDropdownDisplayed": false,
+    "showOutputMappingPopup": false,
+    "showAdvancedConfig": false,
+    "Action": {
+      "NodeId": "2118",
+      "timeout": 0,
+      "scriptAction": {
+        "action": "Both",
+        "inputValidation": {
+          "fileName": "commonScript.js",
+          "functionName": "getReferenceNumber",
+          "condition": ""
+        },
+        "outputValidation": {
+          "fileName": "getProductBalance.js",
+          "functionName": "frameFinalResponse"
+        }
+      },
+      "REST": {
+        "method": "GET",
+        "restServiceUrl": "/docs-api-service/financeManagement/v1/MVNO/0/Subscriber/{:requestMap.publicIdentifier}/Balance?entityType=C&spendGroupDetailsFlag=0&productId={:requestMap.productId}&referenceNumber={:requestMap.referenceNumber}&eventSource=docs&relationShipType=0",
+        "headers": {
+          "authorization": [],
+          "content-type": [
+            "application/json"
+          ]
+        },
+        "responseHeaders": {}
+      },
+      "SOAP": {
+        "requestPayload": {}
+      },
+      "DB": {}
+    },
+    "Output": {
+      "payload": {
+        "key": "value"
+      }
+    },
+    "createdOn": "2025-11-11T10:18:14.246Z",
+    "modifiedOn": "2025-11-19T14:25:31.389Z",
+    "modifiedBy": "professor",
+    "inputType": "S",
+    "exampleInputJson": "",
+    "labelWidth": 0,
+    "isValidService": true,
+    "serviceStatus": "Active"
+  },
+  "lastRefreshed": {
+    "$date": "2025-11-19T14:25:09.453Z"
+  }
+}]
