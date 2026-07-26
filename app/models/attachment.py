@@ -1,9 +1,13 @@
-from pydantic import BaseModel
-from typing import Optional, List
+from typing import List, Optional
+
+from pydantic import BaseModel, Field
 
 
 class Attachment(BaseModel):
 
+    #
+    # Confluence Metadata
+    #
     id: str
 
     page_id: str
@@ -14,24 +18,44 @@ class Attachment(BaseModel):
 
     size: Optional[int] = None
 
+    status: Optional[str] = None
+
+    labels: List[str] = Field(default_factory=list)
+
     download_url: Optional[str] = None
 
     thumbnail_url: Optional[str] = None
 
-    status: Optional[str] = None
+    #
+    # Version Information
+    #
+    version: Optional[int] = None
 
-    labels: List[str] = []
+    version_when: Optional[str] = None
 
+    version_by: Optional[str] = None
+
+    #
+    # Original Creation Information
+    #
     created_by: Optional[str] = None
 
     created_date: Optional[str] = None
 
-    version: Optional[int] = None
-
+    #
+    # Processing Information
+    #
     content: Optional[str] = None
 
     content_hash: Optional[str] = None
 
-    page_title: Optional[str] = None
-
     indexed: bool = False
+
+    last_downloaded: Optional[str] = None
+
+    last_processed: Optional[str] = None
+
+    #
+    # Search Metadata
+    #
+    page_title: Optional[str] = None

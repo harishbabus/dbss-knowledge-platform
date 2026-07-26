@@ -1,6 +1,5 @@
 from app.crawler.delta_sync import DeltaSyncCrawler
 
-
 crawler = DeltaSyncCrawler()
 
 
