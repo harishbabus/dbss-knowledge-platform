@@ -1,16 +1,17 @@
-from typing import Dict, List
+from typing import Any, Dict
 
 from pydantic import BaseModel, Field
+from app.models.page_metadata import PageMetadata
+from app.models.sync_metadata import SyncMetadata
 
 
 class KnowledgePage(BaseModel):
-
     id: str
 
-    metadata: Dict = Field(default_factory=dict)
+    metadata: PageMetadata
 
-    content: Dict = Field(default_factory=dict)
+    content: Dict[str, Any] = Field(default_factory=dict)
 
-    attachments: List[Dict] = Field(default_factory=list)
+    attachments: list[dict[str, Any]] = Field(default_factory=list)
 
-    sync: Dict = Field(default_factory=dict)
+    sync: SyncMetadata

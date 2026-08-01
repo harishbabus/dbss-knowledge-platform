@@ -1,60 +1,71 @@
+from typing import Any
+
+from app.config.settings import settings
 from app.models.knowledge_page import KnowledgePage
-from app.extractors.attachment_extractor import AttachmentExtractor
-from app.storage.attachment_repository import AttachmentRepository
+from app.models.page_metadata import PageMetadata
+from app.models.sync_metadata import SyncMetadata
 
 import hashlib
 from datetime import datetime, timezone
 
 
 class KnowledgeBuilder:
+    def _build_metadata(
+        self,
+        page_data: dict[str, Any],
+    ) -> PageMetadata:
+        history = page_data.get("history", {})
 
-    def __init__(self):
+        version = page_data.get("version", {})
 
-        self.attachment_extractor = AttachmentExtractor()
-
-        self.attachment_repository = AttachmentRepository()
-
-    def build(self, page_data: dict, content: dict, attachments: list):
-
-        text = content.get("plain_text", "")
-
-        content_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
-
-        metadata = {
-            "title": page_data.get("title"),
-            "space": "DPCC",
-            "status": page_data.get("status"),
-            "version": page_data.get("version", {}).get("number"),
-            "created_by": page_data.get("history", {})
-            .get("createdBy", {})
-            .get("displayName"),
-            "created_date": page_data.get("history", {}).get("createdDate"),
-            "updated_by": page_data.get("version", {}).get("by", {}).get("displayName"),
-            "updated_date": page_data.get("version", {}).get("when"),
-            "parent_id": (
+        return PageMetadata(
+            title=page_data.get("title", ""),
+            space=settings.SPACE_KEY,
+            status=page_data.get("status"),
+            version=version.get("number"),
+            created_by=history.get("createdBy", {}).get("displayName"),
+            created_date=history.get("createdDate"),
+            updated_by=version.get("by", {}).get("displayName"),
+            updated_date=version.get("when"),
+            parent_id=(
                 page_data.get("ancestors", [])[-1].get("id")
                 if page_data.get("ancestors")
                 else None
             ),
-            "ancestors": page_data.get("ancestors", []),
-            "labels": [
+            ancestors=page_data.get("ancestors", []),
+            labels=[
                 x.get("name")
                 for x in page_data.get("metadata", {})
                 .get("labels", {})
                 .get("results", [])
             ],
-        }
+            url=page_data.get("_links", {}).get("webui", ""),
+        )
 
-        sync = {
-            "content_hash": content_hash,
-            "last_synced": datetime.now(timezone.utc).isoformat(),
-            "source": "Confluence",
-        }
+    def _build_sync(
+        self,
+        text: str,
+    ) -> SyncMetadata:
+        content_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+        return SyncMetadata(
+            content_hash=content_hash,
+            last_synced=datetime.now(timezone.utc).isoformat(),
+            source="Confluence",
+        )
+
+    def build(
+        self,
+        page_data: dict[str, Any],
+        content: dict[str, Any],
+        attachments: list[dict[str, Any]],
+    ) -> KnowledgePage:
+        text = content.get("plain_text", "")
 
         return KnowledgePage(
             id=str(page_data["id"]),
-            metadata=metadata,
+            metadata=self._build_metadata(page_data),
             content=content,
             attachments=attachments,
-            sync=sync,
+            sync=self._build_sync(text),
         )

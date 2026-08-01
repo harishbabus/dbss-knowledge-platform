@@ -3,7 +3,6 @@ from typing import Optional
 
 
 class AttachmentContent(BaseModel):
-
     id: str
 
     page_id: str
@@ -16,4 +15,4 @@ class AttachmentContent(BaseModel):
 
     file_path: Optional[str] = None
 
-    content_hash: Optional[str] = None
+    content_hash: str

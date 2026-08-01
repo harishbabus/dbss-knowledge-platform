@@ -26,14 +26,18 @@ class AttachmentProcessor:
     - mark indexed
     """
 
-    def __init__(self):
+    def __init__(
+        self,
+        attachment_repo: AttachmentRepository,
+        content_repo: AttachmentContentRepository,
+    ):
         self.downloader = AttachmentDownloader()
 
         self.content_extractor = AttachmentContentExtractor()
 
-        self.content_repo = AttachmentContentRepository()
+        self.attachment_repo = attachment_repo
 
-        self.attachment_repo = AttachmentRepository()
+        self.content_repo = content_repo
 
     def process(
         self,
