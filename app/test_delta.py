@@ -7,15 +7,14 @@ client = ConfluenceClient()
 
 modified_after = datetime.now() - timedelta(days=2)
 
-modified_after = modified_after.strftime("%Y-%m-%d %H:%M")
+modified_after_str = modified_after.strftime("%Y-%m-%d %H:%M")
 
 
-pages = client.get_pages_modified_after(modified_after)
+pages = client.get_pages_modified_after(modified_after_str)
 
 
 print("Modified pages:", len(pages.get("results", [])))
 
 
 for page in pages.get("results", []):
-
     print(page["id"], page["title"])

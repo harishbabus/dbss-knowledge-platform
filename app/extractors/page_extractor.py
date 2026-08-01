@@ -7,9 +7,7 @@ from app.models.page_content import PageContent
 
 
 class PageExtractor:
-
     def extract(self, data: dict):
-
         page = self._extract_page(data)
 
         content = self._extract_content(data)
@@ -17,7 +15,6 @@ class PageExtractor:
         return page, content
 
     def _extract_page(self, data: dict):
-
         ancestors = data.get("ancestors", [])
 
         parent_id = None
@@ -47,9 +44,14 @@ class PageExtractor:
 
         url = base_url + web_ui if web_ui else None
 
+        title = data.get("title")
+
+        if title is None:
+            raise ValueError(f"Page {data['id']} has no title.")
+
         return Page(
             id=str(data["id"]),
-            title=data.get("title"),
+            title=title,
             space="DPCC",
             url=url,
             parent_id=parent_id,
@@ -62,7 +64,6 @@ class PageExtractor:
         )
 
     def _extract_content(self, data: dict):
-
         html = data.get("body", {}).get("storage", {}).get("value", "")
 
         soup = BeautifulSoup(html, "html.parser")
@@ -94,15 +95,12 @@ class PageExtractor:
         )
 
     def _extract_tables(self, soup):
-
         tables = []
 
         for table in soup.find_all("table"):
-
             rows = []
 
             for tr in table.find_all("tr"):
-
                 cells = [
                     cell.get_text(" ", strip=True) for cell in tr.find_all(["th", "td"])
                 ]
@@ -118,13 +116,10 @@ class PageExtractor:
             data_rows = []
 
             for row in rows[1:]:
-
                 item = {}
 
                 for index, value in enumerate(row):
-
                     if index < len(headers):
-
                         item[headers[index]] = value
 
                 data_rows.append(item)
@@ -134,15 +129,12 @@ class PageExtractor:
         return tables
 
     def _extract_code_blocks(self, soup):
-
         blocks = []
 
         for macro in soup.find_all("ac:structured-macro"):
-
             name = macro.get("ac:name")
 
             if name == "code":
-
                 body = macro.find("ac:plain-text-body")
 
                 language = None
@@ -150,21 +142,17 @@ class PageExtractor:
                 parameter = macro.find("ac:parameter")
 
                 if parameter:
-
                     language = parameter.get_text(strip=True)
 
                 if body:
-
                     blocks.append({"language": language, "content": body.get_text()})
 
         return blocks
 
     def _extract_headings(self, soup):
-
         headings = []
 
         for tag in soup.find_all(["h1", "h2", "h3", "h4"]):
-
             text = tag.get_text(" ", strip=True)
 
             if text:
@@ -173,31 +161,25 @@ class PageExtractor:
         return headings
 
     def _extract_links(self, soup):
-
         links = []
 
         for link in soup.find_all("a"):
-
             href = link.get("href")
 
             text = link.get_text(" ", strip=True)
 
             if href:
-
                 links.append({"text": text, "url": href})
 
         return links
 
     def _extract_macros(self, soup):
-
         macros = []
 
         for macro in soup.find_all("ac:structured-macro"):
-
             name = macro.get("ac:name")
 
             if name:
-
                 macros.append(
                     {"type": name, "content": macro.get_text(" ", strip=True)}
                 )

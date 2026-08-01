@@ -23,7 +23,7 @@ page_repo = PageRepository()
 content_repo = ContentRepository()
 
 
-page_repo.save_page(page)
+page_repo.save(page)
 
 
 content_repo.save(content)

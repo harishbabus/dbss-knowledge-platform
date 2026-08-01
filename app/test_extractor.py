@@ -1,5 +1,6 @@
 from app.connectors.confluence_client import ConfluenceClient
 from app.extractors.page_extractor import PageExtractor
+import json
 
 client = ConfluenceClient()
 
@@ -11,10 +12,7 @@ page_id = "150710119"
 
 data = client.get_page_details(page_id)
 
-import json
-
 with open("page_debug.json", "w", encoding="utf-8") as f:
-
     json.dump(data, f, indent=4)
 
 page, content = extractor.extract(data)
