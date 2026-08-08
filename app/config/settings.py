@@ -28,5 +28,10 @@ class Settings:
 
     DATABASE_NAME: str = required_env("DATABASE_NAME")
 
+    CHUNK_SPLITTER: str = os.getenv(
+        "CHUNK_SPLITTER",
+        "character",
+    )
+
 
 settings = Settings()

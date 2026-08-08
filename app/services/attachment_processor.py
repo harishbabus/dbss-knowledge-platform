@@ -30,10 +30,12 @@ class AttachmentProcessor:
         self,
         attachment_repo: AttachmentRepository,
         content_repo: AttachmentContentRepository,
+        downloader: AttachmentDownloader,
+        content_extractor: AttachmentContentExtractor,
     ):
-        self.downloader = AttachmentDownloader()
+        self.downloader = downloader
 
-        self.content_extractor = AttachmentContentExtractor()
+        self.content_extractor = content_extractor
 
         self.attachment_repo = attachment_repo
 

@@ -24,7 +24,7 @@ class AttachmentContentExtractor:
             ".zip": self._extract_zip,
             ".pdf": self._extract_pdf,
             ".docx": self._extract_docx,
-            ".pptx": self._extract_ppt,
+            ".pptx": self._extract_pptx,
             ".png": self._extract_image,
             ".jpg": self._extract_image,
             ".jpeg": self._extract_image,

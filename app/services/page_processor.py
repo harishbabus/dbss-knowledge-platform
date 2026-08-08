@@ -2,6 +2,7 @@ from typing import Any
 
 from app.extractors.page_extractor import PageExtractor
 from app.extractors.attachment_extractor import AttachmentExtractor
+from app.indexing.pipeline import IndexingPipeline
 from app.models.attachment import Attachment
 
 from app.builders.knowledge_builder import KnowledgeBuilder
@@ -16,18 +17,29 @@ from app.utils.logger import logger
 
 
 class PageProcessor:
-    def __init__(self):
-        self.page_extractor = PageExtractor()
+    def __init__(
+        self,
+        indexing_pipeline: IndexingPipeline,
+        builder: KnowledgeBuilder,
+        page_extractor: PageExtractor,
+        attachment_extractor: AttachmentExtractor,
+        knowledge_repo: KnowledgeRepository,
+        attachment_repo: AttachmentRepository,
+        attachment_processor: AttachmentProcessor,
+    ):
+        self.page_extractor = page_extractor
 
-        self.attachment_extractor = AttachmentExtractor()
+        self.attachment_extractor = attachment_extractor
 
-        self.builder = KnowledgeBuilder()
+        self.builder = builder
 
-        self.knowledge_repo = KnowledgeRepository()
+        self.knowledge_repo = knowledge_repo
 
-        self.attachment_repo = AttachmentRepository()
+        self.attachment_repo = attachment_repo
 
-        self.attachment_processor = AttachmentProcessor()
+        self.attachment_processor = attachment_processor
+
+        self.indexing_pipeline = indexing_pipeline
 
     def _delete_removed_attachments(
         self, existing_map: dict[str, dict[str, Any]], attachments: list[Attachment]
@@ -134,74 +146,133 @@ class PageProcessor:
 
         return [attachment.model_dump() for attachment in attachments]
 
-    def process(self, page_id, page_data):
+    def _save_attachment_metadata(
+        self,
+        attachments: list[Attachment],
+    ) -> None:
+        """
+        Saves attachment metadata.
+        """
+
+        self.attachment_repo.save_many(attachments)
+
+    def _build_knowledge_page(
+        self,
+        page_data: dict[str, Any],
+        content: Any,
+        attachments: list[Attachment],
+    ):
+        """
+        Builds the normalized KnowledgePage.
+        """
+
+        return self.builder.build(
+            page_data,
+            content.model_dump(),
+            self._prepare_attachment_data(attachments),
+        )
+
+    def _log_attachment_summary(
+        self,
+        attachments: list[Attachment],
+        attachments_to_process: list[Attachment],
+        deleted_count: int,
+    ) -> None:
+        """
+        Logs attachment processing statistics.
+        """
+
+        logger.info(f"""
+    Page Summary
+
+    Attachments found      : {len(attachments)}
+    Processed attachments  : {len(attachments_to_process)}
+    Skipped attachments    : {len(attachments) - len(attachments_to_process)}
+    Deleted attachments    : {deleted_count}
+    """)
+
+    def process(
+        self,
+        page_id,
+        page_data,
+    ):
         logger.info(f"Processing page {page_id}")
 
         #
-        # Extract page
+        # Extract page content
         #
-        page, content = self.page_extractor.extract(page_data)
+        _, content = self.page_extractor.extract(page_data)
 
         #
         # Extract attachment metadata
         #
         attachment_data = page_data.get("_attachments", [])
 
-        attachments = self.attachment_extractor.extract(page_id, attachment_data)
+        attachments = self.attachment_extractor.extract(
+            page_id,
+            attachment_data,
+        )
 
-        ####################################################
-        # Load existing attachments ONCE
-        ####################################################
-
+        #
+        # Load existing attachment metadata
+        #
         existing_map = self._load_existing_attachments(page_id)
 
-        ####################################################
+        #
         # Detect deleted attachments
-        ####################################################
+        #
+        deleted_count = self._delete_removed_attachments(
+            existing_map,
+            attachments,
+        )
 
-        deleted_count = self._delete_removed_attachments(existing_map, attachments)
-
-        ####################################################
+        #
         # Detect changed attachments
-        ####################################################
-
+        #
         attachments_to_process = self._get_attachments_to_process(
-            attachments, existing_map
+            attachments,
+            existing_map,
         )
 
-        ####################################################
-        # Save metadata
-        ####################################################
+        #
+        # Save attachment metadata
+        #
+        self._save_attachment_metadata(attachments)
 
-        self.attachment_repo.save_many(attachments)
-
-        ####################################################
+        #
         # Process changed attachments
-        ####################################################
-
-        self._process_attachments(attachments_to_process, page_id)
-
-        ####################################################
-        # Statistics
-        ####################################################
-
-        logger.info(f"""
-Page Summary
-
-Attachments found      : {len(attachments)}
-Processed attachments  : {len(attachments_to_process)}
-Skipped attachments    : {len(attachments) - len(attachments_to_process)}
-Deleted attachments    : {deleted_count}
-""")
-
-        ####################################################
-        # Build knowledge page
-        ####################################################
-
-        knowledge_page = self.builder.build(
-            page_data, content.model_dump(), self._prepare_attachment_data(attachments)
+        #
+        self._process_attachments(
+            attachments_to_process,
+            page_id,
         )
 
+        #
+        # Log statistics
+        #
+        self._log_attachment_summary(
+            attachments,
+            attachments_to_process,
+            deleted_count,
+        )
+
+        #
+        # Build KnowledgePage
+        #
+        knowledge_page = self._build_knowledge_page(
+            page_data,
+            content,
+            attachments,
+        )
+
+        #
+        # Run indexing pipeline
+        #
+        self.indexing_pipeline.process(knowledge_page)
+
+        #
+        # Save KnowledgePage
+        #
         self.knowledge_repo.save(knowledge_page)
 
         logger.info(f"Finished page {page_id}")

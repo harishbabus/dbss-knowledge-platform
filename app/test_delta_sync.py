@@ -1,7 +1,8 @@
-from app.crawler.delta_sync import DeltaSyncCrawler
+from app.bootstrap.container import Container
 
-crawler = DeltaSyncCrawler()
+container = Container()
 
+crawler = container.delta_sync_crawler
 
 result = crawler.run()
 

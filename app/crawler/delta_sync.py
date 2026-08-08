@@ -4,7 +4,6 @@ from app.config.settings import settings
 
 from app.connectors.confluence_client import ConfluenceClient
 
-from app.repositories.sync_checkpoint_repository import SyncCheckpointRepository
 
 from app.models.sync_checkpoint import SyncCheckpoint
 
@@ -12,27 +11,28 @@ from app.services.page_processor import PageProcessor
 
 from app.utils.logger import logger
 
+from app.repositories.sync_checkpoint_repository import (
+    SyncCheckpointRepository,
+)
+
 
 class DeltaSyncCrawler:
-
-    def __init__(self):
-
+    def __init__(
+        self,
+        page_processor: PageProcessor,
+    ):
         self.client = ConfluenceClient()
 
+        self.page_processor = page_processor
         self.checkpoint_repo = SyncCheckpointRepository()
 
-        self.page_processor = PageProcessor()
-
     def run(self):
-
         checkpoint = self.checkpoint_repo.get(settings.SPACE_KEY)
 
         if checkpoint:
-
             last_sync_time = checkpoint["last_sync_time"]
 
         else:
-
             logger.info("No checkpoint found. Running from beginning.")
 
             last_sync_time = datetime(2000, 1, 1, tzinfo=timezone.utc)
@@ -52,13 +52,11 @@ class DeltaSyncCrawler:
         latest_processed_time = last_sync_time
 
         for page in results:
-
             page_id = page["id"]
 
             logger.info(f"Processing changed page {page_id}")
 
             try:
-
                 #
                 # Reuse the same logic as full inventory
                 #
@@ -71,11 +69,9 @@ class DeltaSyncCrawler:
                 )
 
                 if page_modified > latest_processed_time:
-
                     latest_processed_time = page_modified
 
             except Exception:
-
                 failed += 1
 
                 logger.exception(f"Failed processing page {page_id}")

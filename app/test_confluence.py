@@ -46,9 +46,8 @@ attachments = client.get_attachments(page_id)
 
 print("\n========== ATTACHMENTS ==========")
 
-print("Attachment count:", len(attachments["results"]))
+print("Attachment count:", len(attachments))
 
 
-for attachment in attachments["results"]:
-
+for attachment in attachments:
     print(attachment["title"])
