@@ -26,6 +26,9 @@ from app.extractors.page_extractor import PageExtractor
 from app.repositories.attachment_content_repository import (
     AttachmentContentRepository,
 )
+from app.repositories.sync_checkpoint_repository import (
+    SyncCheckpointRepository,
+)
 from app.storage.attachment_repository import AttachmentRepository
 from app.storage.knowledge_repository import KnowledgeRepository
 from app.services.attachment_processor import AttachmentProcessor
@@ -97,6 +100,8 @@ class Container:
 
         self.attachment_content_repository = AttachmentContentRepository()
 
+        self.sync_checkpoint_repository = SyncCheckpointRepository()
+
         self.attachment_processor = AttachmentProcessor(
             attachment_repo=self.attachment_repository,
             content_repo=self.attachment_content_repository,
@@ -120,9 +125,15 @@ class Container:
         #
         # Full Inventory Crawler
         #
-        self.crawler = KnowledgeCrawler(page_processor=self.page_processor)
+        self.crawler = KnowledgeCrawler(
+            page_processor=self.page_processor,
+            checkpoint_repository=self.sync_checkpoint_repository,
+        )
 
         #
         # Delta sync crawler
         #
-        self.delta_sync_crawler = DeltaSyncCrawler(page_processor=self.page_processor)
+        self.delta_sync_crawler = DeltaSyncCrawler(
+            page_processor=self.page_processor,
+            checkpoint_repository=self.sync_checkpoint_repository,
+        )

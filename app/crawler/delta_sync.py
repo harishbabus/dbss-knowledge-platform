@@ -1,104 +1,185 @@
+from __future__ import annotations
+
 from datetime import datetime, timezone
 
 from app.config.settings import settings
-
 from app.connectors.confluence_client import ConfluenceClient
-
-
-from app.models.sync_checkpoint import SyncCheckpoint
-
+from app.repositories.sync_checkpoint_repository import SyncCheckpointRepository
 from app.services.page_processor import PageProcessor
-
+from app.storage.page_sync_state_repository import PageSyncStateRepository
 from app.utils.logger import logger
-
-from app.repositories.sync_checkpoint_repository import (
-    SyncCheckpointRepository,
-)
 
 
 class DeltaSyncCrawler:
+    """Processes changed Confluence pages and maintains a global watermark."""
+
+    DEFAULT_SYNC_ID = "confluence_delta"
+
     def __init__(
         self,
         page_processor: PageProcessor,
-    ):
+        sync_state_repository: PageSyncStateRepository | None = None,
+        checkpoint_repository: SyncCheckpointRepository | None = None,
+        sync_id: str | None = None,
+    ) -> None:
         self.client = ConfluenceClient()
-
         self.page_processor = page_processor
-        self.checkpoint_repo = SyncCheckpointRepository()
+        self.sync_state_repository = sync_state_repository or PageSyncStateRepository()
+        self.checkpoint_repository = checkpoint_repository or SyncCheckpointRepository()
+        self.sync_id = sync_id or f"{settings.SPACE_KEY}:{self.DEFAULT_SYNC_ID}"
 
-    def run(self):
-        checkpoint = self.checkpoint_repo.get(settings.SPACE_KEY)
+    @staticmethod
+    def _format_modified_after(value: datetime) -> str:
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M")
 
-        if checkpoint:
-            last_sync_time = checkpoint["last_sync_time"]
+    def _resolve_modified_after(
+        self,
+        modified_after: str | datetime | None,
+    ) -> str:
+        if modified_after is not None:
+            if isinstance(modified_after, datetime):
+                return self._format_modified_after(modified_after)
 
-        else:
-            logger.info("No checkpoint found. Running from beginning.")
+            if not isinstance(modified_after, str):
+                raise TypeError("modified_after must be a string or datetime")
 
-            last_sync_time = datetime(2000, 1, 1, tzinfo=timezone.utc)
+            if not modified_after.strip():
+                raise ValueError("modified_after cannot be empty")
 
-        logger.info(f"Delta sync starting from {last_sync_time}")
+            return modified_after.strip()
 
-        pages = self.client.get_pages_modified_after(last_sync_time)
+        checkpoint = self.checkpoint_repository.get_last_successful(self.sync_id)
 
-        results = pages.get("results", [])
-
-        logger.info(f"Pages changed: {len(results)}")
-
-        processed = 0
-
-        failed = 0
-
-        latest_processed_time = last_sync_time
-
-        for page in results:
-            page_id = page["id"]
-
-            logger.info(f"Processing changed page {page_id}")
-
-            try:
-                #
-                # Reuse the same logic as full inventory
-                #
-                self.page_processor.process_page(page_id)
-
-                processed += 1
-
-                page_modified = datetime.fromisoformat(
-                    page["version"]["when"].replace("Z", "+00:00")
-                )
-
-                if page_modified > latest_processed_time:
-                    latest_processed_time = page_modified
-
-            except Exception:
-                failed += 1
-
-                logger.exception(f"Failed processing page {page_id}")
-
-        #
-        # Update checkpoint
-        #
-        self.checkpoint_repo.save(
-            SyncCheckpoint(
-                id=settings.SPACE_KEY,
-                last_sync_time=latest_processed_time,
-                status=("SUCCESS" if failed == 0 else "PARTIAL"),
-                processed_pages=processed,
-                last_processed_page=(results[-1]["id"] if results else None),
+        if checkpoint is None:
+            raise ValueError(
+                "No successful sync checkpoint exists. "
+                "Run an initial inventory crawl first or provide modified_after."
             )
+
+        resolved = self._format_modified_after(checkpoint)
+
+        logger.info(
+            f"Using last successful sync checkpoint: {resolved} "
+            f"(sync_id={self.sync_id})"
         )
 
-        logger.info(f"""
-Delta Sync Complete
+        return resolved
 
-Processed : {processed}
-Failed    : {failed}
-Last Sync : {latest_processed_time}
-""")
+    def run(
+        self,
+        modified_after: str | datetime | None = None,
+        *,
+        batch_size: int = 100,
+    ) -> dict[str, int | bool | str]:
+        if batch_size <= 0:
+            raise ValueError("batch_size must be greater than zero")
+
+        resolved_modified_after = self._resolve_modified_after(modified_after)
+
+        # Capture the watermark before querying Confluence. Changes made
+        # during this run are intentionally left for the next run.
+        run_started_at = datetime.now(timezone.utc)
+
+        processed = 0
+        skipped = 0
+        saved = 0
+        failed = 0
+        candidates = 0
+        start = 0
+        last_processed_page: str | None = None
+
+        while True:
+            response = self.client.get_pages_modified_after(
+                resolved_modified_after,
+                start=start,
+                limit=batch_size,
+            )
+
+            pages = response.get("results", [])
+
+            if not pages:
+                break
+
+            batch_count = len(pages)
+            candidates += batch_count
+
+            logger.info(f"Delta batch: start={start}, count={batch_count}")
+
+            for index, item in enumerate(pages, start=start + 1):
+                page_id = str(item["id"])
+
+                logger.info(f"Delta page {index}/{start + batch_count} (ID: {page_id})")
+
+                try:
+                    page_data = self.client.get_page_details(page_id)
+
+                    version = page_data.get("version", {}).get("number")
+                    previous = self.sync_state_repository.get(page_id)
+
+                    if previous is not None and previous.get("version") == version:
+                        skipped += 1
+                        logger.info(
+                            f"Skipping unchanged page {page_id} (version {version})"
+                        )
+                        continue
+
+                    self.page_processor.process(page_id, page_data)
+
+                    self.sync_state_repository.save(
+                        page_id=page_id,
+                        version=version,
+                        modified_at=page_data.get("version", {}).get("when"),
+                    )
+
+                    processed += 1
+                    saved += 1
+                    last_processed_page = page_id
+
+                except Exception as exc:
+                    failed += 1
+                    logger.error(f"Failed delta page {page_id}\n\n{exc}")
+
+            if batch_count < batch_size:
+                break
+
+            start += batch_count
+
+        checkpoint_updated = False
+
+        if failed == 0:
+            self.checkpoint_repository.save_success(
+                sync_id=self.sync_id,
+                last_sync_time=run_started_at,
+                processed_pages=processed,
+                last_processed_page=last_processed_page,
+            )
+            checkpoint_updated = True
+            logger.info(
+                f"Advanced sync checkpoint to "
+                f"{self._format_modified_after(run_started_at)}"
+            )
+        else:
+            logger.warning("Delta sync had failures; sync checkpoint was NOT advanced.")
+
+        logger.info(
+            f"""
+Delta sync complete:
+
+Candidates          : {candidates}
+Processed           : {processed}
+Skipped             : {skipped}
+Saved               : {saved}
+Failed              : {failed}
+Checkpoint updated : {checkpoint_updated}
+"""
+        )
 
         return {
+            "candidates": candidates,
             "processed": processed,
+            "skipped": skipped,
+            "saved": saved,
             "failed": failed,
-            "last_sync_time": latest_processed_time,
         }

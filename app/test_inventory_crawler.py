@@ -10,6 +10,8 @@ def test_run_respects_max_pages():
 
     crawler.client = MagicMock()
     crawler.page_processor = MagicMock()
+    crawler.checkpoint_repository = MagicMock()
+    crawler.sync_id = "DPCC:confluence_delta"
 
     crawler.client.get_pages.side_effect = [
         {
@@ -60,6 +62,8 @@ def test_run_stops_when_confluence_returns_no_pages():
 
     crawler.client = MagicMock()
     crawler.page_processor = MagicMock()
+    crawler.checkpoint_repository = MagicMock()
+    crawler.sync_id = "DPCC:confluence_delta"
 
     crawler.client.get_pages.return_value = {"results": []}
 
@@ -89,3 +93,48 @@ def test_run_rejects_invalid_max_pages():
 
     with pytest.raises(ValueError):
         crawler.run(max_pages=0)
+
+
+def test_run_advances_checkpoint_after_complete_inventory():
+    crawler = KnowledgeCrawler.__new__(KnowledgeCrawler)
+    crawler.client = MagicMock()
+    crawler.page_processor = MagicMock()
+    crawler.checkpoint_repository = MagicMock()
+    crawler.sync_id = "DPCC:confluence_delta"
+
+    crawler.client.get_pages.side_effect = [
+        {"results": [{"id": "1"}]},
+        {"results": []},
+    ]
+    crawler.client.get_page_details.side_effect = lambda page_id: {
+        "id": page_id,
+        "version": {"number": 1, "when": "2026-08-09T00:00:00Z"},
+    }
+
+    result = crawler.run(batch_size=100)
+
+    assert result == {"processed": 1, "saved": 1, "failed": 0}
+    crawler.checkpoint_repository.save_success.assert_called_once()
+    call = crawler.checkpoint_repository.save_success.call_args.kwargs
+    assert call["sync_id"] == "DPCC:confluence_delta"
+    assert call["processed_pages"] == 1
+
+
+def test_run_does_not_advance_checkpoint_when_page_fails():
+    crawler = KnowledgeCrawler.__new__(KnowledgeCrawler)
+    crawler.client = MagicMock()
+    crawler.page_processor = MagicMock()
+    crawler.checkpoint_repository = MagicMock()
+    crawler.sync_id = "DPCC:confluence_delta"
+
+    crawler.client.get_pages.side_effect = [
+        {"results": [{"id": "1"}]},
+        {"results": []},
+    ]
+    crawler.client.get_page_details.return_value = {"id": "1"}
+    crawler.page_processor.process.side_effect = RuntimeError("failed")
+
+    result = crawler.run(batch_size=100)
+
+    assert result == {"processed": 1, "saved": 0, "failed": 1}
+    crawler.checkpoint_repository.save_success.assert_not_called()

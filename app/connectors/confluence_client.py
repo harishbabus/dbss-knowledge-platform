@@ -97,11 +97,26 @@ Reason   : {last_exception}
             params={"start": start, "limit": limit},
         )
 
-    def get_pages_modified_after(self, modified_after: Any) -> dict[str, Any]:
+    def get_pages_modified_after(
+        self,
+        modified_after: Any,
+        *,
+        start: int = 0,
+        limit: int = 100,
+    ) -> dict[str, Any]:
         if hasattr(modified_after, "strftime"):
             modified_after = modified_after.strftime("%Y-%m-%d %H:%M")
 
-        logger.info(f"Fetching pages modified after {modified_after}")
+        if start < 0:
+            raise ValueError("start cannot be negative")
+
+        if limit <= 0:
+            raise ValueError("limit must be greater than zero")
+
+        logger.info(
+            f"Fetching pages modified after {modified_after} "
+            f"(start={start}, limit={limit})"
+        )
 
         cql = (
             f"type=page "
@@ -113,7 +128,12 @@ Reason   : {last_exception}
 
         return self._get(
             f"{self.content_url}/search",
-            params={"cql": cql, "limit": 100, "expand": "version"},
+            params={
+                "cql": cql,
+                "start": start,
+                "limit": limit,
+                "expand": "version",
+            },
         )
 
     def get_page_details(self, page_id: str) -> dict[str, Any]:
