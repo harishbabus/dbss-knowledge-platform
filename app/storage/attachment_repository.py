@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+from app.models.attachment_processing_result import AttachmentProcessingStatus
 from app.storage.mongodb import mongodb
 from app.utils.logger import logger
 
@@ -41,53 +42,131 @@ class AttachmentRepository:
     def needs_processing(self, attachment):
         existing = self.get(attachment.id)
 
-        #
-        # Brand new attachment
-        #
         if not existing:
             logger.info(f"New attachment detected: {attachment.filename}")
-
             return True
 
-        #
-        # Version changed
-        #
         if existing.get("version") != attachment.version:
             logger.info(f"Version changed: {attachment.filename}")
-
             return True
 
-        #
-        # Size changed
-        #
         if existing.get("size") != attachment.size:
             logger.info(f"Size changed: {attachment.filename}")
-
             return True
 
-        logger.info(f"Attachment unchanged: {attachment.filename}")
+        status = existing.get("processing_status")
+        if status in {
+            AttachmentProcessingStatus.DOWNLOAD_FAILED,
+            AttachmentProcessingStatus.EXTRACTION_FAILED,
+        }:
+            logger.info(
+                f"Retrying attachment with previous status {status}: "
+                f"{attachment.filename}"
+            )
+            return True
 
+        if status == AttachmentProcessingStatus.UNSUPPORTED:
+            logger.info(
+                f"Attachment unsupported and will not be retried: {attachment.filename}"
+            )
+            return False
+
+        # Same version and size with no retryable failure is unchanged.
+        # Do not require an `indexed` flag here: older attachment records
+        # predate processing_status/indexed and remain valid unchanged records.
+        logger.info(f"Attachment unchanged: {attachment.filename}")
         return False
+
+    def mark_downloaded(
+        self,
+        attachment_id: str,
+        file_path: str,
+        size: int | None,
+        content_hash: str | None,
+    ) -> None:
+        self.collection.update_one(
+            {"id": attachment_id},
+            {
+                "$set": {
+                    "downloaded_path": file_path,
+                    "size": size,
+                    "download_hash": content_hash,
+                    "last_downloaded": datetime.now(timezone.utc),
+                    "processing_status": None,
+                    "processing_error": None,
+                }
+            },
+        )
+
+    def mark_processing_status(
+        self,
+        attachment_id: str,
+        status: str,
+        error: str | None = None,
+    ) -> None:
+        self.collection.update_one(
+            {"id": attachment_id},
+            {
+                "$set": {
+                    "indexed": False,
+                    "processing_status": status,
+                    "processing_error": error,
+                    "last_processed": datetime.now(timezone.utc),
+                }
+            },
+        )
 
     def mark_indexed(
         self,
         attachment_id: str,
         content_hash: str,
     ) -> None:
-        """
-        Marks an attachment as indexed and stores
-        the extracted content hash.
-        """
-
         self.collection.update_one(
             {"id": attachment_id},
             {
                 "$set": {
                     "indexed": True,
                     "content_hash": content_hash,
+                    "processing_status": "SUCCESS",
+                    "processing_error": None,
+                    "last_processed": datetime.now(timezone.utc),
                     "indexed_at": datetime.now(timezone.utc),
                 }
             },
+        )
+
+    def get_retryable_by_page(self, page_id: str) -> list[dict]:
+        """Return attachments on a page that are eligible for automatic retry."""
+        return list(
+            self.collection.find(
+                {
+                    "page_id": str(page_id),
+                    "processing_status": {
+                        "$in": [
+                            AttachmentProcessingStatus.DOWNLOAD_FAILED,
+                            AttachmentProcessingStatus.EXTRACTION_FAILED,
+                        ]
+                    },
+                }
+            )
+        )
+
+    def has_retryable_by_page(self, page_id: str) -> bool:
+        """Return True when a page has an attachment eligible for retry."""
+        return (
+            self.collection.count_documents(
+                {
+                    "page_id": str(page_id),
+                    "processing_status": {
+                        "$in": [
+                            AttachmentProcessingStatus.DOWNLOAD_FAILED,
+                            AttachmentProcessingStatus.EXTRACTION_FAILED,
+                        ]
+                    },
+                },
+                limit=1,
+            )
+            > 0
         )
 
     def delete(self, attachment_id):

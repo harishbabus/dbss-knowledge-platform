@@ -118,12 +118,34 @@ class DeltaSyncCrawler:
                     version = page_data.get("version", {}).get("number")
                     previous = self.sync_state_repository.get(page_id)
 
-                    if previous is not None and previous.get("version") == version:
+                    same_version = (
+                        previous is not None and previous.get("version") == version
+                    )
+
+                    retryable_attachments = False
+                    if same_version:
+                        retryable_attachments = (
+                            self.page_processor.attachment_repo.has_retryable_by_page(
+                                page_id
+                            )
+                        )
+
+                    if same_version and not retryable_attachments:
                         skipped += 1
                         logger.info(
                             f"Skipping unchanged page {page_id} (version {version})"
                         )
                         continue
+
+                    if same_version and retryable_attachments:
+                        logger.info(
+                            f"Retrying attachment failures for unchanged page "
+                            f"{page_id} (version {version})"
+                        )
+
+                    # Changed/new pages and pages with retryable attachment
+                    # failures need current attachment discovery.
+                    page_data["_attachments"] = self.client.get_attachments(page_id)
 
                     self.page_processor.process(page_id, page_data)
 

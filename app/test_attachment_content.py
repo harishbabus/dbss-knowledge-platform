@@ -1,38 +1,18 @@
-from app.connectors.confluence_client import ConfluenceClient
-from app.extractors.attachment_extractor import AttachmentExtractor
 from app.extractors.attachment_content_extractor import AttachmentContentExtractor
-from app.connectors.attachment_downloader import AttachmentDownloader
-
-page_id = "97627136"
+from app.models.attachment import Attachment
 
 
-client = ConfluenceClient()
+def test_text_attachment_extracts_from_explicit_path(tmp_path):
+    path = tmp_path / "sample.txt"
+    path.write_text("hello knowledge platform", encoding="utf-8")
 
+    attachment = Attachment(
+        id="att-1",
+        page_id="page-1",
+        filename="sample.txt",
+    )
 
-raw = client.get_attachments(page_id)
+    content = AttachmentContentExtractor().extract(attachment, file_path=path)
 
-
-attachments = AttachmentExtractor().extract(page_id, raw)
-
-
-downloader = AttachmentDownloader()
-
-extractor = AttachmentContentExtractor()
-
-
-for attachment in attachments:
-
-    downloader.download(attachment)
-
-    content = extractor.extract(attachment)
-
-    if content:
-        print(content["text"][:500])
-    else:
-        print("No Extractable Content")
-
-    print("\n=================")
-
-    print(attachment.filename)
-
-    print(content if content else "No content")
+    assert content is not None
+    assert content.text == "hello knowledge platform"

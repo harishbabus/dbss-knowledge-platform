@@ -4,7 +4,6 @@ from pydantic import BaseModel, Field
 
 
 class Attachment(BaseModel):
-
     #
     # Confluence Metadata
     #
@@ -50,6 +49,12 @@ class Attachment(BaseModel):
     content_hash: Optional[str] = None
 
     indexed: bool = False
+
+    processing_status: Optional[str] = None
+
+    processing_error: Optional[str] = None
+
+    downloaded_path: Optional[str] = None
 
     last_downloaded: Optional[str] = None
 

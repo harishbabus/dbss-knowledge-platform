@@ -15,6 +15,8 @@ class ContentType(StrEnum):
     IMAGE = "image"
     PPTX = "pptx"
     TEXT = "text"
+    LDIF = "ldif"
+    RAR = "rar"
     XML = "xml"
     HTML = "html"
     UNKNOWN = "unknown"

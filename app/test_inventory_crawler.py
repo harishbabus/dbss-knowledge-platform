@@ -30,6 +30,7 @@ def test_run_respects_max_pages():
     ]
 
     crawler.client.get_page_details.side_effect = lambda page_id: {"id": page_id}
+    crawler.client.get_attachments.return_value = []
 
     result = crawler.run(
         batch_size=3,
@@ -55,6 +56,10 @@ def test_run_respects_max_pages():
     }
 
     assert crawler.page_processor.process.call_count == 5
+    assert crawler.client.get_attachments.call_count == 5
+
+    for call in crawler.page_processor.process.call_args_list:
+        assert call.args[1]["_attachments"] == []
 
 
 def test_run_stops_when_confluence_returns_no_pages():
@@ -110,6 +115,7 @@ def test_run_advances_checkpoint_after_complete_inventory():
         "id": page_id,
         "version": {"number": 1, "when": "2026-08-09T00:00:00Z"},
     }
+    crawler.client.get_attachments.return_value = []
 
     result = crawler.run(batch_size=100)
 
@@ -132,6 +138,7 @@ def test_run_does_not_advance_checkpoint_when_page_fails():
         {"results": []},
     ]
     crawler.client.get_page_details.return_value = {"id": "1"}
+    crawler.client.get_attachments.return_value = []
     crawler.page_processor.process.side_effect = RuntimeError("failed")
 
     result = crawler.run(batch_size=100)

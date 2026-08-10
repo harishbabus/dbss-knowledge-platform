@@ -13,6 +13,10 @@ def _crawler():
     crawler.sync_state_repository = MagicMock()
     crawler.checkpoint_repository = MagicMock()
     crawler.sync_id = "DPCC:confluence_delta"
+    crawler.client.get_attachments.return_value = []
+    # MagicMock is truthy by default; unchanged-page tests must explicitly
+    # say there are no retryable attachment failures.
+    crawler.page_processor.attachment_repo.has_retryable_by_page.return_value = False
     return crawler
 
 
@@ -36,6 +40,8 @@ def test_delta_processes_new_page():
         "failed": 0,
     }
     crawler.page_processor.process.assert_called_once()
+    assert crawler.page_processor.process.call_args.args[1]["_attachments"] == []
+    crawler.client.get_attachments.assert_called_once_with("123")
     crawler.checkpoint_repository.save_success.assert_called_once()
 
 
@@ -80,6 +86,8 @@ def test_delta_processes_changed_version():
     assert result["skipped"] == 0
     assert result["failed"] == 0
     crawler.page_processor.process.assert_called_once()
+    assert crawler.page_processor.process.call_args.args[1]["_attachments"] == []
+    crawler.client.get_attachments.assert_called_once_with("123")
     crawler.sync_state_repository.save.assert_called_once()
     crawler.checkpoint_repository.save_success.assert_called_once()
 
@@ -174,3 +182,28 @@ def test_delta_does_not_advance_checkpoint_when_page_fails():
     assert result["processed"] == 0
     assert result["failed"] == 1
     crawler.checkpoint_repository.save_success.assert_not_called()
+
+
+def test_delta_retries_attachment_failure_on_unchanged_page():
+    crawler = _crawler()
+
+    crawler.client.get_pages_modified_after.return_value = {"results": [{"id": "123"}]}
+    crawler.client.get_page_details.return_value = {
+        "id": "123",
+        "version": {"number": 5, "when": "2026-08-09T01:00:00Z"},
+    }
+    crawler.sync_state_repository.get.return_value = {
+        "page_id": "123",
+        "version": 5,
+    }
+    crawler.page_processor.attachment_repo.has_retryable_by_page.return_value = True
+
+    result = crawler.run("2026-08-09 00:00")
+
+    assert result["processed"] == 1
+    assert result["skipped"] == 0
+    assert result["failed"] == 0
+    crawler.client.get_attachments.assert_called_once_with("123")
+    crawler.page_processor.process.assert_called_once()
+    crawler.sync_state_repository.save.assert_called_once()
+    crawler.checkpoint_repository.save_success.assert_called_once()

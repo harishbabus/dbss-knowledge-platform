@@ -85,6 +85,10 @@ class KnowledgeCrawler:
                 try:
                     page_data = self.client.get_page_details(page_id)
 
+                    # Attachment discovery is explicit so PageProcessor receives
+                    # the current attachment list with the page data.
+                    page_data["_attachments"] = self.client.get_attachments(page_id)
+
                     self.page_processor.process(
                         page_id,
                         page_data,

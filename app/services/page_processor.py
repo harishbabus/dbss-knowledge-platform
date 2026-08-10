@@ -12,6 +12,10 @@ from app.storage.knowledge_repository import KnowledgeRepository
 from app.storage.attachment_repository import AttachmentRepository
 
 from app.services.attachment_processor import AttachmentProcessor
+from app.models.attachment_processing_result import (
+    AttachmentProcessingResult,
+    AttachmentProcessingStatus,
+)
 
 from app.utils.logger import logger
 
@@ -62,44 +66,43 @@ class PageProcessor:
     def _get_attachments_to_process(
         self, attachments: list[Attachment], existing_map: dict[str, dict[str, Any]]
     ) -> list[Attachment]:
-        """
-        Returns attachments that require processing.
-        """
-
         attachments_to_process: list[Attachment] = []
+
+        # Only failures that may succeed on a later attempt are retried
+        # automatically. UNSUPPORTED is a deterministic capability result and
+        # should not cause the same attachment to be downloaded repeatedly.
+        retry_statuses = {
+            AttachmentProcessingStatus.DOWNLOAD_FAILED,
+            AttachmentProcessingStatus.EXTRACTION_FAILED,
+        }
 
         for attachment in attachments:
             existing_attachment = existing_map.get(attachment.id)
 
-            #
-            # New attachment
-            #
             if existing_attachment is None:
                 self._queue_attachment_for_processing(
                     attachment, "New attachment", attachments_to_process
                 )
-
                 continue
 
-            #
-            # Version changed
-            #
             if existing_attachment.get("version") != attachment.version:
                 self._queue_attachment_for_processing(
                     attachment, "Version changed", attachments_to_process
                 )
-
                 continue
 
-            #
-            # Size changed
-            #
             if existing_attachment.get("size") != attachment.size:
                 self._queue_attachment_for_processing(
                     attachment, "Size changed", attachments_to_process
                 )
-
                 continue
+
+            if existing_attachment.get("processing_status") in retry_statuses:
+                self._queue_attachment_for_processing(
+                    attachment,
+                    f"Retry status={existing_attachment.get('processing_status')}",
+                    attachments_to_process,
+                )
 
         return attachments_to_process
 
@@ -113,18 +116,17 @@ class PageProcessor:
 
         attachments_to_process.append(attachment)
 
-    def _process_attachments(self, attachments: list[Attachment], page_id: str) -> None:
-        """
-        Process all attachments that require indexing.
-        """
+    def _process_attachments(
+        self, attachments: list[Attachment], page_id: str
+    ) -> list[AttachmentProcessingResult]:
+        results: list[AttachmentProcessingResult] = []
 
         for attachment in attachments:
             logger.info(f"Extracting {attachment.filename}")
+            result = self.attachment_processor.process(attachment, page_id)
+            results.append(result)
 
-            self.attachment_processor.process(
-                attachment,
-                page_id,
-            )
+        return results
 
     def _load_existing_attachments(self, page_id) -> dict[str, dict[str, Any]]:
         """
@@ -176,20 +178,46 @@ class PageProcessor:
         self,
         attachments: list[Attachment],
         attachments_to_process: list[Attachment],
+        results: list[AttachmentProcessingResult],
         deleted_count: int,
     ) -> None:
-        """
-        Logs attachment processing statistics.
-        """
+        counts = {
+            AttachmentProcessingStatus.SUCCESS: 0,
+            AttachmentProcessingStatus.UNSUPPORTED: 0,
+            AttachmentProcessingStatus.EXTRACTION_FAILED: 0,
+            AttachmentProcessingStatus.DOWNLOAD_FAILED: 0,
+        }
+        for result in results:
+            counts[result.status] = counts.get(result.status, 0) + 1
+
+        skipped = len(attachments) - len(attachments_to_process)
 
         logger.info(f"""
     Page Summary
 
-    Attachments found      : {len(attachments)}
-    Processed attachments  : {len(attachments_to_process)}
-    Skipped attachments    : {len(attachments) - len(attachments_to_process)}
-    Deleted attachments    : {deleted_count}
+    Attachments found       : {len(attachments)}
+    Queued for processing   : {len(attachments_to_process)}
+    Indexed successfully    : {counts[AttachmentProcessingStatus.SUCCESS]}
+    Unsupported             : {counts[AttachmentProcessingStatus.UNSUPPORTED]}
+    Extraction failed       : {counts[AttachmentProcessingStatus.EXTRACTION_FAILED]}
+    Download failed         : {counts[AttachmentProcessingStatus.DOWNLOAD_FAILED]}
+    Skipped unchanged       : {skipped}
+    Deleted                 : {deleted_count}
     """)
+
+        failures = [
+            result
+            for result in results
+            if result.status != AttachmentProcessingStatus.SUCCESS
+        ]
+
+        if failures:
+            logger.warning("Attachment failures:")
+            for result in failures:
+                logger.warning(
+                    f"  {result.status}: {result.attachment_id} | "
+                    f"{result.filename} | {result.error or 'No error detail'}"
+                )
 
     def process(
         self,
@@ -242,17 +270,15 @@ class PageProcessor:
         #
         # Process changed attachments
         #
-        self._process_attachments(
+        processing_results = self._process_attachments(
             attachments_to_process,
             page_id,
         )
 
-        #
-        # Log statistics
-        #
         self._log_attachment_summary(
             attachments,
             attachments_to_process,
+            processing_results,
             deleted_count,
         )
 
