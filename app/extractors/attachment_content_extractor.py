@@ -330,11 +330,11 @@ Sheet: {sheet}\
                 finally:
                     image.close()
             except Exception:
-                # A few files are mislabeled image attachments containing SVG/XML.
-                # Preserve useful searchable content rather than blindly trusting
-                # the filename extension.
+                # Do not trust the filename extension blindly. Confluence can
+                # contain attachments whose names say .png/.jpg while the
+                # payload is actually JSON, XML/SVG, or plain text.
                 ImageFile.LOAD_TRUNCATED_IMAGES = previous
-                textual = self._extract_xml_image_fallback(file_path)
+                textual = self._extract_mislabeled_image_fallback(file_path)
                 if textual is not None:
                     return textual
                 raise first_exc
@@ -351,6 +351,74 @@ Sheet: {sheet}\
                 "format": image_format,
             },
         )
+
+    @staticmethod
+    def _extract_mislabeled_image_fallback(file_path: Path):
+        """Extract searchable text when an image extension has non-image bytes."""
+        try:
+            sample = file_path.read_bytes()[
+                : AttachmentContentExtractor.TEXT_SAMPLE_BYTES
+            ]
+        except OSError:
+            return None
+
+        if not sample or b"\x00" in sample:
+            return None
+
+        try:
+            text = file_path.read_text(encoding="utf-8-sig", errors="strict")
+        except (OSError, UnicodeDecodeError):
+            return None
+
+        stripped = text.lstrip()
+        if not stripped:
+            return ExtractedContent(
+                text="",
+                content_type=ContentType.TEXT,
+                file_path=str(file_path),
+                metadata={"fallback": "mislabeled-image"},
+            )
+
+        if stripped.startswith(("{", "[")):
+            try:
+                data = json.loads(text)
+                return ExtractedContent(
+                    text=json.dumps(data, indent=2, ensure_ascii=False),
+                    content_type=ContentType.JSON,
+                    file_path=str(file_path),
+                    metadata={"json_parsed": True, "fallback": "mislabeled-image"},
+                )
+            except json.JSONDecodeError:
+                return ExtractedContent(
+                    text=text,
+                    content_type=ContentType.JSON,
+                    file_path=str(file_path),
+                    metadata={"json_parsed": False, "fallback": "mislabeled-image"},
+                )
+
+        lowered = stripped.lower()
+        if (
+            lowered.startswith("<?xml")
+            or lowered.startswith("<svg")
+            or "<svg" in lowered[:4096]
+        ):
+            return ExtractedContent(
+                text=text,
+                content_type=ContentType.IMAGE,
+                file_path=str(file_path),
+                metadata={"format": "svg", "fallback": "xml-image"},
+            )
+
+        printable = sum(ch.isprintable() or ch in "\r\n\t" for ch in text)
+        if printable / max(len(text), 1) >= 0.85:
+            return ExtractedContent(
+                text=text,
+                content_type=ContentType.TEXT,
+                file_path=str(file_path),
+                metadata={"fallback": "mislabeled-image"},
+            )
+
+        return None
 
     @staticmethod
     def _extract_xml_image_fallback(file_path: Path):

@@ -260,3 +260,20 @@ def test_download_retries_temporary_file_os_error(tmp_path):
     assert path.read_bytes() == b"second"
     assert calls["count"] == 2
     assert list(tmp_path.rglob("*.part")) == []
+
+
+def test_download_temp_file_is_not_hidden_part_file(tmp_path):
+    attachment = _attachment(filename="data.ldif")
+    response = _response([b"dn: uid=test,dc=example"])
+    downloader = AttachmentDownloader(
+        download_dir=tmp_path, retries=1, retry_delays=(0,)
+    )
+    with patch(
+        "app.connectors.attachment_downloader.httpx.stream",
+        return_value=response,
+    ):
+        path = downloader.download(attachment)
+    assert path is not None
+    assert path.read_text(encoding="utf-8") == "dn: uid=test,dc=example"
+    assert list(tmp_path.rglob("*.download")) == []
+    assert list(tmp_path.rglob("*.part")) == []

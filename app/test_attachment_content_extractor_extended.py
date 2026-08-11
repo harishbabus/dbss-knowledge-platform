@@ -89,3 +89,20 @@ def test_svg_payload_with_png_extension_uses_text_fallback(tmp_path):
     assert content.metadata["format"] == "svg"
     assert "hello knowledge platform" in content.text
     assert error is None
+
+
+def test_json_payload_with_png_extension_uses_content_sniffing(tmp_path):
+    path = tmp_path / "image.png"
+    path.write_text(
+        '{"event": "profile", "status": "FAILED", "customerId": "1001"}',
+        encoding="utf-8",
+    )
+    status, content, error = AttachmentContentExtractor().extract_with_status(
+        attachment(path.name), path
+    )
+    assert status == AttachmentProcessingStatus.SUCCESS
+    assert content is not None
+    assert content.content_type == ContentType.JSON
+    assert content.metadata["json_parsed"] is True
+    assert '"status": "FAILED"' in content.text
+    assert error is None
