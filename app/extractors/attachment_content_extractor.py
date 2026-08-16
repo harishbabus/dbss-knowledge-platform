@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import zipfile
+import io
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,8 @@ class AttachmentContentExtractor:
 
     MAX_ARCHIVE_FILES = 10_000
     MAX_ARCHIVE_BYTES = 512 * 1024 * 1024
+    MAX_ARCHIVE_MEMBER_BYTES = 100 * 1024 * 1024
+    MAX_EXTRACTED_TEXT_CHARS = 5_000_000
     TEXT_SAMPLE_BYTES = 64 * 1024
 
     def __init__(self):
@@ -32,6 +35,16 @@ class AttachmentContentExtractor:
         return {
             ".xlsx": self._extract_excel,
             ".csv": self._extract_csv,
+            ".tsv": self._extract_text,
+            ".properties": self._extract_text,
+            ".conf": self._extract_text,
+            ".cfg": self._extract_text,
+            ".ini": self._extract_text,
+            ".yaml": self._extract_text,
+            ".yml": self._extract_text,
+            ".sql": self._extract_text,
+            ".log": self._extract_text,
+            ".md": self._extract_text,
             ".json": self._extract_json,
             ".zip": self._extract_zip,
             ".rar": self._extract_rar,
@@ -112,9 +125,62 @@ class AttachmentContentExtractor:
 
         if suffix == "":
             # Some historical Confluence attachment names contain no extension.
-            # Detect common JSON first, then fall back to text if the payload is textual.
             if self._looks_like_text(file_path):
                 return self._extract_unknown_text
+
+        # Confluence occasionally serves an attachment with a misleading
+        # filename/extension. Use the file signature as a controlled fallback.
+        detected = self._detect_binary_type(file_path)
+        if detected == "zip":
+            return self._extract_zip
+        if detected == "pdf":
+            return self._extract_pdf
+        if detected == "docx":
+            return self._extract_docx
+        if detected == "pptx":
+            return self._extract_pptx
+        if detected == "image":
+            return self._extract_image
+
+        return None
+
+    @staticmethod
+    def _detect_binary_type(file_path: Path) -> str | None:
+        """Detect a small set of common formats from their magic bytes."""
+        try:
+            header = file_path.read_bytes()[:16]
+        except OSError:
+            return None
+
+        if header.startswith(b"PK\x03\x04"):
+            # ZIP-based Office formats are all ZIP containers.
+            try:
+                with zipfile.ZipFile(file_path) as archive:
+                    names = set(archive.namelist())
+                if "[Content_Types].xml" in names:
+                    if any(name.startswith("word/") for name in names):
+                        return "docx"
+                    if any(name.startswith("ppt/") for name in names):
+                        return "pptx"
+                return "zip"
+            except (OSError, zipfile.BadZipFile):
+                return None
+
+        if header.startswith(b"%PDF"):
+            return "pdf"
+
+        if header.startswith(
+            (
+                b"\x89PNG",
+                b"\xff\xd8\xff",
+                b"GIF87a",
+                b"GIF89a",
+                b"BM",
+                b"II*\x00",
+                b"MM\x00*",
+            )
+        ):
+            return "image"
 
         return None
 
@@ -126,7 +192,7 @@ class AttachmentContentExtractor:
 
     def _looks_like_text(self, file_path: Path) -> bool:
         sample = file_path.read_bytes()[: self.TEXT_SAMPLE_BYTES]
-        if not sample or b"\\x00" in sample:
+        if not sample or b"\x00" in sample:
             return False
         try:
             decoded = sample.decode("utf-8")
@@ -239,9 +305,10 @@ Sheet: {sheet}\
             metadata={},
         )
 
-    @staticmethod
-    def _read_text(file_path: Path) -> str:
-        return file_path.read_text(encoding="utf-8", errors="ignore")
+    @classmethod
+    def _read_text(cls, file_path: Path) -> str:
+        with file_path.open("r", encoding="utf-8", errors="ignore") as handle:
+            return handle.read(cls.MAX_EXTRACTED_TEXT_CHARS)
 
     def _extract_text(self, file_path):
         logger.info(f"Reading text: {file_path}")
@@ -449,30 +516,38 @@ Sheet: {sheet}\
         logger.info(f"Reading ZIP: {file_path}")
         content = []
         total_bytes = 0
+
         with zipfile.ZipFile(file_path, "r") as archive:
             infos = [info for info in archive.infolist() if not info.is_dir()]
             self._validate_archive_limits(infos, "ZIP")
+
             for info in infos:
-                total_bytes += info.file_size
+                member_size = int(info.file_size or 0)
+                self._validate_member_size(member_size, info.filename, "ZIP")
+                total_bytes += member_size
+
                 if total_bytes > self.MAX_ARCHIVE_BYTES:
                     raise ValueError(
                         f"ZIP expanded size exceeds {self.MAX_ARCHIVE_BYTES} bytes"
                     )
+
                 data = archive.read(info)
-                decoded = self._decode_archive_member(data)
-                if decoded is not None:
-                    content.append(
-                        f"\
-FILE: {info.filename}\
-"
-                    )
-                    content.append(decoded)
+                extracted = self._extract_archive_member(
+                    data,
+                    info.filename,
+                )
+                if extracted:
+                    content.append(f"FILE: {info.filename}{extracted}")
+
+        text = "\n".join(content)
         return ExtractedContent(
-            text="\
-".join(content),
+            text=text,
             content_type=ContentType.ZIP,
             file_path=str(file_path),
-            metadata={"member_count": len(infos)},
+            metadata={
+                "member_count": len(infos),
+                "expanded_bytes": total_bytes,
+            },
         )
 
     def _extract_rar(self, file_path):
@@ -481,30 +556,38 @@ FILE: {info.filename}\
 
         content = []
         total_bytes = 0
+
         with rarfile.RarFile(file_path) as archive:
             infos = [info for info in archive.infolist() if not info.is_dir()]
             self._validate_archive_limits(infos, "RAR")
+
             for info in infos:
-                total_bytes += int(getattr(info, "file_size", 0) or 0)
+                member_size = int(getattr(info, "file_size", 0) or 0)
+                self._validate_member_size(member_size, info.filename, "RAR")
+                total_bytes += member_size
+
                 if total_bytes > self.MAX_ARCHIVE_BYTES:
                     raise ValueError(
                         f"RAR expanded size exceeds {self.MAX_ARCHIVE_BYTES} bytes"
                     )
+
                 data = archive.read(info)
-                decoded = self._decode_archive_member(data)
-                if decoded is not None:
-                    content.append(
-                        f"\
-FILE: {info.filename}\
-"
-                    )
-                    content.append(decoded)
+                extracted = self._extract_archive_member(
+                    data,
+                    info.filename,
+                )
+                if extracted:
+                    content.append(f"FILE: {info.filename}{extracted}")
+
+        text = "\n".join(content)
         return ExtractedContent(
-            text="\
-".join(content),
+            text=text,
             content_type=ContentType.RAR,
             file_path=str(file_path),
-            metadata={"member_count": len(infos)},
+            metadata={
+                "member_count": len(infos),
+                "expanded_bytes": total_bytes,
+            },
         )
 
     def _validate_archive_limits(self, infos, kind: str) -> None:
@@ -513,14 +596,155 @@ FILE: {info.filename}\
                 f"{kind} contains {len(infos)} files; limit is {self.MAX_ARCHIVE_FILES}"
             )
 
-    @staticmethod
-    def _decode_archive_member(data: bytes) -> str | None:
-        if b"\\x00" in data[:4096]:
+    def _validate_member_size(
+        self,
+        member_size: int,
+        member_name: str,
+        kind: str,
+    ) -> None:
+        if member_size > self.MAX_ARCHIVE_MEMBER_BYTES:
+            raise ValueError(
+                f"{kind} member '{member_name}' is {member_size} bytes; "
+                f"limit is {self.MAX_ARCHIVE_MEMBER_BYTES}"
+            )
+
+    def _extract_archive_member(
+        self,
+        data: bytes,
+        member_name: str,
+    ) -> str | None:
+        """Extract useful text from a single archive member.
+
+        The member is never written to disk. Text/configuration files are
+        decoded directly; common Office/PDF formats are extracted in memory.
+        Binary files without searchable text are skipped.
+        """
+        if not data:
             return None
+
+        suffix = Path(member_name).suffix.lower()
+
+        if suffix in {
+            ".txt",
+            ".csv",
+            ".tsv",
+            ".xml",
+            ".html",
+            ".htm",
+            ".ldif",
+            ".properties",
+            ".conf",
+            ".cfg",
+            ".ini",
+            ".yaml",
+            ".yml",
+            ".sql",
+            ".log",
+            ".md",
+        }:
+            return self._decode_archive_member(data)
+
+        if suffix == ".json":
+            decoded = self._decode_archive_member(data)
+            if decoded is None:
+                return None
+            try:
+                return json.dumps(
+                    json.loads(decoded),
+                    indent=2,
+                    ensure_ascii=False,
+                )
+            except json.JSONDecodeError:
+                return decoded
+
+        if suffix == ".pdf":
+            import fitz
+
+            document = fitz.open(stream=data, filetype="pdf")
+            try:
+                return "\n".join(
+                    page.get_text() for page in document if page.get_text()
+                )
+            finally:
+                document.close()
+
+        if suffix == ".docx":
+            from docx import Document
+
+            document = Document(io.BytesIO(data))
+            content = [p.text for p in document.paragraphs if p.text]
+            for table in document.tables:
+                for row in table.rows:
+                    values = [cell.text.strip() for cell in row.cells]
+                    if any(values):
+                        content.append(" | ".join(values))
+            return "\n".join(content) if content else None
+
+        if suffix == ".pptx":
+            from pptx import Presentation
+
+            presentation = Presentation(io.BytesIO(data))
+            content = []
+            for slide in presentation.slides:
+                for shape in slide.shapes:
+                    if hasattr(shape, "text") and shape.text:
+                        content.append(shape.text)
+            return "\n".join(content) if content else None
+
+        if suffix == ".xlsx":
+            from openpyxl import load_workbook
+
+            workbook = load_workbook(
+                filename=io.BytesIO(data),
+                data_only=True,
+                read_only=True,
+            )
+            content = []
+            try:
+                for sheet in workbook.sheetnames:
+                    content.append(f"Sheet: {sheet}")
+                    for row in workbook[sheet].iter_rows(values_only=True):
+                        values = [str(cell) for cell in row if cell is not None]
+                        if values:
+                            content.append(" | ".join(values))
+            finally:
+                workbook.close()
+            return "\n".join(content) if content else None
+
+        if suffix in {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tif", ".tiff"}:
+            from PIL import Image
+            import pytesseract
+
+            image = Image.open(io.BytesIO(data))
+            try:
+                image.load()
+                return pytesseract.image_to_string(image)
+            finally:
+                image.close()
+
+        # If the member has no extension, preserve textual configuration.
+        if suffix == "":
+            return self._decode_archive_member(data)
+
+        return None
+
+    @classmethod
+    def _decode_archive_member(cls, data: bytes) -> str | None:
+        if b"\x00" in data[:4096]:
+            return None
+
         try:
-            return data.decode("utf-8")
+            text = data.decode("utf-8-sig")
         except UnicodeDecodeError:
             try:
-                return data.decode("latin-1")
+                text = data.decode("latin-1")
             except UnicodeDecodeError:
                 return None
+
+        printable = sum(ch.isprintable() or ch in "\r\n\t" for ch in text)
+        if text and printable / len(text) < 0.85:
+            return None
+
+        # Archive members are already bounded by MAX_ARCHIVE_MEMBER_BYTES and
+        # MAX_ARCHIVE_BYTES, so preserve the complete textual member.
+        return text
